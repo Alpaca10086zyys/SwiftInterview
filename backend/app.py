@@ -1,12 +1,11 @@
 from flask import Flask
+from flask_cors import CORS
+from routes.knowledge import knowledge_bp
 
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
+    CORS(app)
+    app.register_blueprint(knowledge_bp, url_prefix='/api')
+    return app
 
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
-
-
-if __name__ == '__main__':
-    app.run()
