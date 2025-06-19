@@ -30,3 +30,6 @@ def delete_file_metadata(filename):
 
 def get_all_files():
     return {"files": load_metadata()}
+
+def demo():
+    print(1)
