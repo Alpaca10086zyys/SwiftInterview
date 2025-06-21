@@ -1,24 +1,9 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.reply.ui.navigation
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -80,7 +65,7 @@ import com.example.reply.ui.utils.ReplyNavigationContentPosition
 import kotlinx.coroutines.launch
 
 private fun WindowSizeClass.isCompact() = windowWidthSizeClass == WindowWidthSizeClass.COMPACT ||
-    windowHeightSizeClass == WindowHeightSizeClass.COMPACT
+        windowHeightSizeClass == WindowHeightSizeClass.COMPACT
 
 class ReplyNavSuiteScope(val navSuiteType: NavigationSuiteType)
 
@@ -99,14 +84,14 @@ fun ReplyNavigationWrapper(
         adaptiveInfo.windowPosture.isTabletop -> NavigationSuiteType.NavigationBar
         adaptiveInfo.windowSizeClass.isCompact() -> NavigationSuiteType.NavigationBar
         adaptiveInfo.windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED &&
-            windowSize.width >= 1200.dp -> NavigationSuiteType.NavigationDrawer
+                windowSize.width >= 1200.dp -> NavigationSuiteType.NavigationDrawer
         else -> NavigationSuiteType.NavigationRail
     }
     val navContentPosition = when (adaptiveInfo.windowSizeClass.windowHeightSizeClass) {
         WindowHeightSizeClass.COMPACT -> ReplyNavigationContentPosition.TOP
         WindowHeightSizeClass.MEDIUM,
         WindowHeightSizeClass.EXPANDED,
-        -> ReplyNavigationContentPosition.CENTER
+            -> ReplyNavigationContentPosition.CENTER
         else -> ReplyNavigationContentPosition.TOP
     }
 
@@ -145,7 +130,7 @@ fun ReplyNavigationWrapper(
                 when (navLayoutType) {
                     NavigationSuiteType.NavigationBar -> ReplyBottomNavigationBar(
                         currentDestination = currentDestination,
-                        navigateToTopLevelDestination = navigateToTopLevelDestination,
+                        navigateToTopLevelDestination = navigateToTopLevelDestination
                     )
                     NavigationSuiteType.NavigationRail -> ReplyNavigationRail(
                         currentDestination = currentDestination,
@@ -236,8 +221,12 @@ fun ReplyNavigationRail(
 }
 
 @Composable
-fun ReplyBottomNavigationBar(currentDestination: NavDestination?, navigateToTopLevelDestination: (ReplyTopLevelDestination) -> Unit) {
+fun ReplyBottomNavigationBar(
+    currentDestination: NavDestination?,
+    navigateToTopLevelDestination: (ReplyTopLevelDestination) -> Unit,
+) {
     NavigationBar(modifier = Modifier.fillMaxWidth()) {
+        // 遍历所有五个目的地
         TOP_LEVEL_DESTINATIONS.forEach { replyDestination ->
             NavigationBarItem(
                 selected = currentDestination.hasRoute(replyDestination),

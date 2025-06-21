@@ -30,8 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.compose.AppTheme
 import com.example.reply.data.local.LocalEmailsDataProvider
-import com.example.reply.ui.theme.ContrastAwareReplyTheme
 import com.google.accompanist.adaptive.calculateDisplayFeatures
 
 class MainActivity : ComponentActivity() {
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ContrastAwareReplyTheme {
+            AppTheme {
                 val windowSize = calculateWindowSizeClass(this)
                 val displayFeatures = calculateDisplayFeatures(this)
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun ReplyAppPreview() {
-    ContrastAwareReplyTheme {
+    AppTheme {
         ReplyApp(
             replyHomeUIState = ReplyHomeUIState(emails = LocalEmailsDataProvider.allEmails),
             windowSize = WindowSizeClass.calculateFromSize(DpSize(400.dp, 900.dp)),
@@ -85,7 +85,7 @@ fun ReplyAppPreview() {
 @Preview(showBackground = true, widthDp = 700, heightDp = 500)
 @Composable
 fun ReplyAppPreviewTablet() {
-    ContrastAwareReplyTheme {
+    AppTheme {
         ReplyApp(
             replyHomeUIState = ReplyHomeUIState(emails = LocalEmailsDataProvider.allEmails),
             windowSize = WindowSizeClass.calculateFromSize(DpSize(700.dp, 500.dp)),
@@ -98,7 +98,7 @@ fun ReplyAppPreviewTablet() {
 @Preview(showBackground = true, widthDp = 500, heightDp = 700)
 @Composable
 fun ReplyAppPreviewTabletPortrait() {
-    ContrastAwareReplyTheme {
+    AppTheme {
         ReplyApp(
             replyHomeUIState = ReplyHomeUIState(emails = LocalEmailsDataProvider.allEmails),
             windowSize = WindowSizeClass.calculateFromSize(DpSize(500.dp, 700.dp)),
@@ -111,7 +111,7 @@ fun ReplyAppPreviewTabletPortrait() {
 @Preview(showBackground = true, widthDp = 1100, heightDp = 600)
 @Composable
 fun ReplyAppPreviewDesktop() {
-    ContrastAwareReplyTheme {
+    AppTheme {
         ReplyApp(
             replyHomeUIState = ReplyHomeUIState(emails = LocalEmailsDataProvider.allEmails),
             windowSize = WindowSizeClass.calculateFromSize(DpSize(1100.dp, 600.dp)),
@@ -124,7 +124,7 @@ fun ReplyAppPreviewDesktop() {
 @Preview(showBackground = true, widthDp = 600, heightDp = 1100)
 @Composable
 fun ReplyAppPreviewDesktopPortrait() {
-    ContrastAwareReplyTheme {
+    AppTheme {
         ReplyApp(
             replyHomeUIState = ReplyHomeUIState(emails = LocalEmailsDataProvider.allEmails),
             windowSize = WindowSizeClass.calculateFromSize(DpSize(600.dp, 1100.dp)),
