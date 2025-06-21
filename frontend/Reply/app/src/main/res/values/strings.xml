@@ -10,6 +10,8 @@
   -->
 <resources>
     <string name="app_name">Reply</string>
+    <string name="book_title">Book</string>
+    <string name="create_new">Create New</string>
     <string name="navigation_drawer">Navigation Drawer</string>
     <string name="close_drawer">Close drawer</string>
     <string name="tab_inbox">Inbox</string>
@@ -34,6 +36,7 @@
     <string name="four_hours_ago">4 hrs ago</string>
 
     <string name="search_emails">Search emails</string>
+
     <string name="no_item_found">No item found</string>
     <string name="no_search_history">No search history</string>
 </resources>
