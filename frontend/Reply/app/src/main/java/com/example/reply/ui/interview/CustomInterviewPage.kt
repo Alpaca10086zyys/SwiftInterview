@@ -27,15 +27,17 @@ fun CustomInterviewPage(onStartInterview: () -> Unit = {}) {
     val focusOptions = listOf("项目经历", "基础知识", "行业理解", "应变能力", "沟通表达", "逻辑思维")
     val selectedFocus = remember { mutableStateListOf<String>() }
 
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "定制面试",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -135,15 +137,35 @@ fun CustomInterviewPage(onStartInterview: () -> Unit = {}) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            val isFormComplete = job != null && style != null && selectedFocus.isNotEmpty()
+
+            val buttonColors = ButtonDefaults.buttonColors(
+                containerColor = if (isFormComplete)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                contentColor = if (isFormComplete)
+                    MaterialTheme.colorScheme.onPrimary
+                else
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+            )
+
             // 进入按钮
             Button(
-                onClick = onStartInterview,
+                onClick = {
+                    if (isFormComplete) {
+                        onStartInterview()
+                    }
+                },
+                enabled = isFormComplete,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp)
+                    .padding(vertical = 16.dp),
+                colors = buttonColors
             ) {
                 Text("进入面试")
             }
+
 
             Spacer(Modifier.height(32.dp))
         }
@@ -165,7 +187,8 @@ fun SectionCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(8.dp),
+                color = MaterialTheme.colorScheme.onSurface
             )
             content()
         }
