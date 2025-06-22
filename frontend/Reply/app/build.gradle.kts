@@ -124,6 +124,10 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.window)
 
+    //自己加的
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.runner)

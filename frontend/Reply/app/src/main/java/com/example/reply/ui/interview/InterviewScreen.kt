@@ -2,11 +2,12 @@ package com.example.reply.ui.interview
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
+import com.example.reply.ui.EmptyComingSoon
 
 enum class InterviewPage {
     Entry,
     CustomInterview,
-    //QuestionPage // 后续扩展
+    ChatInterview// 后续扩展
 }
 
 @Composable
@@ -20,9 +21,10 @@ fun InterviewScreen() {
 
         InterviewPage.CustomInterview -> CustomInterviewPage(
             onStartInterview = {
-                //currentPage = InterviewPage.QuestionPage // 后续跳转
+                currentPage = InterviewPage.ChatInterview // 后续跳转
             }
         )
-        //InterviewPage.QuestionPage -> QuestionPage() // TODO
+
+        InterviewPage.ChatInterview -> QuestionPage()
     }
 }
