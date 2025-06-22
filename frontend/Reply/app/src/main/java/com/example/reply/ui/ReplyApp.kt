@@ -16,6 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
 import com.example.reply.ui.interview.InterviewScreen
+import com.example.reply.ui.homepage.GroupsScreen
+import com.example.reply.ui.homepage.LoginScreen
 import com.example.reply.ui.navigation.ReplyNavigationActions
 import com.example.reply.ui.navigation.ReplyNavigationWrapper
 import com.example.reply.ui.navigation.Route
@@ -113,14 +115,14 @@ private fun ReplyNavHost(
         composable<Route.DirectMessages> {
             EmptyComingSoon()
         }
-        composable<Route.Book> { // 书本页面（第三个位置）
+        composable<Route.Book> {
             EmptyComingSoon()
         }
         composable<Route.Articles> {
             EmptyComingSoon()
         }
         composable<Route.Groups> {
-            EmptyComingSoon()
+            GroupsScreen()
         }
     }
 }
