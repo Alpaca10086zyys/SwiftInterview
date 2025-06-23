@@ -1,0 +1,16 @@
+[
+  {
+    "filename": "test.txt",
+    "path": "uploads\\test.txt"
+  },
+  {
+    "filename": "test.txt",
+    "path": "uploads\\6\\test.txt",
+    "user_id": "6"
+  },
+  {
+    "filename": "test_1750620228.txt",
+    "path": "uploads\\6\\test_1750620228.txt",
+    "user_id": "6"
+  }
+]
