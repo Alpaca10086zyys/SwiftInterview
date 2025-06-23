@@ -14,9 +14,12 @@ def save_metadata(data):
     with open(metadata_file, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-def save_file_metadata(name, path):
+def save_file_metadata(name, path, user_id=None):
     data = load_metadata()
-    data.append({"filename": name, "path": path})
+    record = {"filename": name, "path": path}
+    if user_id is not None:
+        record["user_id"] = user_id
+    data.append(record)
     save_metadata(data)
 
 def delete_file_metadata(filename):
