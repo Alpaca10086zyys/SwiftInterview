@@ -57,6 +57,8 @@ def ask_model(question_text, session_id, system_prompt, conversation_history="")
 
 # 示例：调用ask_model提问
 def ask_one_question(prompt):
+    if not prompt:
+        prompt = "你作为面试官，请开始提问。"
     session_id = str(uuid.uuid4())  # 初始化会话ID
     system_prompt = "你是面试官，负责问问题。"  # 模型的角色定位
     question_text = prompt  # 问题内容

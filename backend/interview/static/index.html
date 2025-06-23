@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Recorder</title>
+</head>
+<body>
+    <h1>录音</h1>
+    <button id="startBtn">开始录音</button>
+    <button id="stopBtn" disabled>停止录音</button>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        // 开始录音
+        document.getElementById("startBtn").onclick = async function() {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'recording.wav');
+
+                // 发送音频文件到Flask服务器
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                  .then(data => console.log(data));
+            };
+
+            mediaRecorder.start();
+            document.getElementById("stopBtn").disabled = false;
+            document.getElementById("startBtn").disabled = true;
+        };
+
+        // 停止录音
+        document.getElementById("stopBtn").onclick = function() {
+            mediaRecorder.stop();
+            document.getElementById("stopBtn").disabled = true;
+            document.getElementById("startBtn").disabled = false;
+        };
+    </script>
+</body>
+</html>

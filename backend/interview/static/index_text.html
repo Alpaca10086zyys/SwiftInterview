@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试问题</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        #question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>面试问题</h1>
+
+    <div id="question">正在加载第一个问题...</div>
+
+    <input type="text" id="answer" placeholder="请输入您的回答..." />
+    <button id="submitBtn">提交回答</button>
+
+    <script>
+        // 启动时，获取第一个问题
+        function getFirstQuestion() {
+            fetch('/start_text_interview', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('question').innerText = data.next_question;
+            })
+            .catch(error => console.error('获取第一个问题失败:', error));
+        }
+
+        // 提交用户回答并获取下一个问题
+        document.getElementById('submitBtn').onclick = function() {
+            const userAnswer = document.getElementById('answer').value;
+
+            if (!userAnswer) {
+                alert("请输入回答！");
+                return;
+            }
+
+            // 将用户回答提交到 Flask 后端
+            fetch('/last_text_question', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: userAnswer })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('question').innerText = data.next_question;
+                document.getElementById('answer').value = '';  // 清空输入框
+            })
+            .catch(error => console.error('提交回答失败:', error));
+        };
+
+        // 页面加载时，获取第一个问题
+        window.onload = getFirstQuestion;
+    </script>
+</body>
+</html>
