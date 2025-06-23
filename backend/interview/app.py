@@ -8,7 +8,7 @@ app = Flask(__name__)
 # 声明 base_prompt 为全局变量
 base_prompt = ""
 
-@app.route('/modify-text', methods=['GET'])
+@app.route('/modify-text', methods=['POST'])
 def modify_text():
     global base_prompt  # 使用 global 关键字修改全局变量
     # 从请求中获取指令
