@@ -21,10 +21,13 @@ fun InterviewScreen() {
 
         InterviewPage.CustomInterview -> CustomInterviewPage(
             onStartInterview = {
-                currentPage = InterviewPage.ChatInterview // 后续跳转
+                currentPage = InterviewPage.ChatInterview
             }
         )
 
-        InterviewPage.ChatInterview -> QuestionPage()
+        InterviewPage.ChatInterview -> QuestionPage(
+            onExitInterview = { currentPage = InterviewPage.Entry }
+        )
     }
 }
+

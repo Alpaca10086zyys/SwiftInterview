@@ -1,5 +1,6 @@
 package com.example.reply.ui.interview
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
@@ -11,13 +12,10 @@ import androidx.compose.ui.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.foundation.lazy.grid.*
+import com.example.reply.ui.network.InterviewConfigUploader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -153,8 +151,20 @@ fun CustomInterviewPage(onStartInterview: () -> Unit = {}) {
             // 进入按钮
             Button(
                 onClick = {
+                    // 请注意：这里是相关配置上传逻辑
                     if (isFormComplete) {
-                        onStartInterview()
+                        InterviewConfigUploader.uploadConfig(
+                            job = job ?: "",
+                            style = style ?: "",
+                            focus = selectedFocus,
+                            serverUrl = "http://192.168.0.104:5000/modify-text"
+
+                        ) { success, response ->
+                            Log.d("Upload", "Success=$success, Response=$response")
+                            if (success) {
+                                onStartInterview()
+                            }
+                        }
                     }
                 },
                 enabled = isFormComplete,
@@ -181,8 +191,13 @@ fun SectionCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+    ){
         Column(modifier = Modifier.padding(8.dp)) {
             Text(
                 text = title,
