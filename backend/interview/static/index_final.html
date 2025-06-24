@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 面试官</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+        #questionText, #userResponse { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>AI 面试模拟</h1>
+
+    <div id="questionSection">
+        <h2>问题：</h2>
+        <p id="questionText">点击“开始面试”开始</p>
+        <audio id="questionAudio" controls></audio>
+    </div>
+
+    <div id="recordSection">
+        <button id="startBtn">开始录音</button>
+        <button id="stopBtn" disabled>停止录音</button>
+    </div>
+
+    <div id="responseSection">
+        <h2>识别出的回答：</h2>
+        <p id="userResponse">（等待录音上传和识别）</p>
+    </div>
+
+    <button id="startInterviewBtn">开始面试</button>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        // 开始面试
+        document.getElementById("startInterviewBtn").onclick = function () {
+            fetch('/start_interview', {
+                method: 'POST'
+            }).then(response => response.json())
+              .then(data => {
+                  document.getElementById("questionText").textContent = data.next_question;
+                  document.getElementById("questionAudio").src = data.audio_url;
+              });
+        };
+
+        // 开始录音
+        document.getElementById("startBtn").onclick = async function () {
+            audioChunks = []; // 清空之前的内容
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'recording.wav');
+
+                fetch('/upload_audio_final', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                  .then(data => {
+                      document.getElementById("userResponse").textContent = data.user_response;
+                      document.getElementById("questionText").textContent = data.next_question;
+                      document.getElementById("questionAudio").src = data.audio_url;
+                  });
+            };
+
+            mediaRecorder.start();
+            document.getElementById("stopBtn").disabled = false;
+            document.getElementById("startBtn").disabled = true;
+        };
+
+        // 停止录音
+        document.getElementById("stopBtn").onclick = function () {
+            mediaRecorder.stop();
+            document.getElementById("stopBtn").disabled = true;
+            document.getElementById("startBtn").disabled = false;
+        };
+    </script>
+</body>
+</html>

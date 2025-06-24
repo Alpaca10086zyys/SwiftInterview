@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试问题</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        #question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        audio {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>面试问题</h1>
+
+    <div id="question">正在加载第一个问题...</div>
+
+    <audio id="audio-player" controls></audio>
+
+    <input type="file" id="audio-file" accept="audio/*" />
+    <button id="submitBtn">提交录音回答</button>
+
+    <script>
+        let audioUrl = '';  // 用来存储音频地址
+
+        // 获取第一个问题并音频地址
+        function getFirstQuestion() {
+            fetch('/start_interview', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('question').innerText = data.next_question;
+                audioUrl = data.audio_url;
+                document.getElementById('audio-player').src = audioUrl; // 设置音频地址
+            })
+            .catch(error => console.error('获取第一个问题失败:', error));
+        }
+
+        // 提交用户录音并获取下一个问题
+        document.getElementById('submitBtn').onclick = function() {
+            const audioFile = document.getElementById('audio-file').files[0];
+
+            if (!audioFile) {
+                alert("请先录制音频！");
+                return;
+            }
+
+            // 创建 FormData 以便上传音频文件
+            const formData = new FormData();
+            formData.append('audio', audioFile);
+
+            // 将录音文件上传到 Flask 后端
+            fetch('/upload_file', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 获取返回的音频文件路径，并传递给后端进行识别
+                const filePath = data.path;
+
+                return fetch('/upload_audio', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ audio_path: filePath })
+                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('question').innerText = data.next_question;
+                audioUrl = data.audio_url;
+                document.getElementById('audio-player').src = audioUrl;  // 更新音频地址
+            })
+            .catch(error => console.error('上传或识别失败:', error));
+        };
+
+        // 页面加载时，获取第一个问题
+        window.onload = getFirstQuestion;
+    </script>
+</body>
+</html>
