@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, send_from_directory
 import os
 from werkzeug.utils import secure_filename
 from services.knowledge_service import save_file_metadata, delete_file_metadata, get_all_files
-from utils.embedding.text_embedder import embed_txt_file
+from utils.embedding.text_embedder import embed_txt_file,get_embedding
 from utils.supabase_client import get_supabase
 import time
 
@@ -128,3 +128,47 @@ def list_files():
 @knowledge_bp.route('/knowledge/download/<filename>', methods=['GET'])
 def download_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+
+@knowledge_bp.route('/knowledge/search', methods=['POST'])
+def search_files():
+    """
+    请求格式：
+    {
+        "query": "搜索关键词",
+        "user_id": "用户ID",
+        "threshold": 0.7,  # 可选，相似度阈值
+        "top_k": 5         # 可选，返回结果数
+    }
+    """
+    data = request.get_json()
+    query = data.get("query")
+    user_id = data.get("user_id")
+    threshold = data.get("threshold", 0.7)
+    top_k = data.get("top_k", 5)
+
+    if not query or not user_id:
+        return jsonify({"error": "缺少必要参数"}), 400
+
+    # 获取查询文本的嵌入向量
+    try:
+        query_embedding = get_embedding(query)
+    except Exception as e:
+        return jsonify({"error": f"向量化失败: {str(e)}"}), 500
+
+    # 执行 Supabase 搜索
+    supabase = get_supabase()
+    try:
+        result = supabase.rpc('search_vectors', {
+            'user_id': user_id,
+            'query_embedding': query_embedding,
+            'match_threshold': threshold,
+            'match_count': top_k
+        }).execute()
+
+        return jsonify({
+            "results": result.data,
+            "query": query,
+            "user_id": user_id
+        })
+    except Exception as e:
+        return jsonify({"error": f"搜索失败: {str(e)}"}), 500
