@@ -157,7 +157,7 @@ fun CustomInterviewPage(onStartInterview: () -> Unit = {}) {
                             job = job ?: "",
                             style = style ?: "",
                             focus = selectedFocus,
-                            serverUrl = "http://100.84.252.55:5000/modify-text" //"http://192.168.0.104:5000/modify-text"
+                            serverUrl = "http://192.168.0.104:5000/modify-text" //"http://100.84.252.55:5000/modify-text" 
 
                         ) { success, response ->
                             Log.d("Upload", "Success=$success, Response=$response")
