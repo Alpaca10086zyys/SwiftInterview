@@ -17,7 +17,8 @@ import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
 import com.example.reply.ui.interview.InterviewScreen
 import com.example.reply.ui.homepage.GroupsScreen
-import com.example.reply.ui.homepage.LoginScreen
+import com.example.reply.ui.knowledgebase.KnowledgeBaseScreen
+import com.example.reply.ui.knowledgebase.UploadScreen
 import com.example.reply.ui.navigation.ReplyNavigationActions
 import com.example.reply.ui.navigation.ReplyNavigationWrapper
 import com.example.reply.ui.navigation.Route
@@ -116,13 +117,16 @@ private fun ReplyNavHost(
             EmptyComingSoon()
         }
         composable<Route.Book> {
-            EmptyComingSoon()
+            KnowledgeBaseScreen(navController)
         }
         composable<Route.Articles> {
             EmptyComingSoon()
         }
         composable<Route.Groups> {
             GroupsScreen()
+        }
+        composable<Route.Upload> {
+            UploadScreen(navController)
         }
     }
 }

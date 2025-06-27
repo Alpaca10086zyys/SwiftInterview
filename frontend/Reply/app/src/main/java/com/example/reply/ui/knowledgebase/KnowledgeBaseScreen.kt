@@ -1,0 +1,142 @@
+package com.example.reply.ui.knowledgebase
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.example.reply.ui.navigation.ReplyNavigationActions
+
+@Composable
+fun KnowledgeBaseScreen(navController: NavController) {
+    var selectedTab by remember { mutableStateOf(KnowledgeBaseTab.PERSONAL_DOCS) }
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            // 搜索框
+            OutlinedTextField(
+                value = searchText,
+                onValueChange = { searchText = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .focusRequester(focusRequester),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "搜索"
+                    )
+                },
+                placeholder = { Text("搜索") },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 修复：将 weight 移到 RowScope 中
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                KnowledgeBaseTab.values().forEach { tab ->
+                    // 将 weight 应用到这里的 Modifier 上
+                    TabButton(
+                        text = tab.title,
+                        isSelected = selectedTab == tab,
+                        onClick = { selectedTab = tab },
+                        modifier = Modifier.weight(1f) // 将 weight 移到这里
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 内容区域
+            when (selectedTab) {
+                KnowledgeBaseTab.PERSONAL_DOCS -> PersonalDocumentsScreen()
+                KnowledgeBaseTab.INTERVIEW_ARCHIVE -> InterviewArchiveScreen()
+            }
+        }
+
+        // 悬浮按钮
+        FloatingActionButton(
+            onClick = {
+                // 使用导航动作导航到上传页面
+                ReplyNavigationActions(navController as NavHostController).navigateToUpload()
+            },
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomEnd),
+            containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "上传",
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    }
+}
+
+// 修改：添加 modifier 参数
+@Composable
+fun TabButton(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+    val contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+
+    TextButton(
+        onClick = onClick,
+        modifier = modifier
+            .height(48.dp)
+            .background(backgroundColor, RoundedCornerShape(8.dp)), // 移除 weight
+        contentPadding = PaddingValues(0.dp)
+    ) {
+        Text(
+            text = text,
+            color = contentColor,
+            style = MaterialTheme.typography.labelLarge
+        )
+    }
+}
+
+enum class KnowledgeBaseTab(val title: String) {
+    PERSONAL_DOCS("个人文档"),
+    INTERVIEW_ARCHIVE("面试归档")
+}

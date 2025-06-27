@@ -17,9 +17,10 @@ import kotlinx.serialization.Serializable
 sealed interface Route {
     @Serializable data object Inbox : Route
     @Serializable data object DirectMessages : Route
-    @Serializable data object Book : Route // 书本路由
+    @Serializable data object Book : Route
     @Serializable data object Articles : Route
     @Serializable data object Groups : Route
+    @Serializable data object Upload : Route
 }
 
 data class ReplyTopLevelDestination(val route: Route, val selectedIcon: ImageVector, val unselectedIcon: ImageVector, val iconTextId: Int)
@@ -35,6 +36,13 @@ class ReplyNavigationActions(private val navController: NavHostController) {
             restoreState = true
         }
     }
+
+    fun navigateToUpload() {
+        navController.navigate(Route.Upload) {
+            launchSingleTop = true
+        }
+    }
+
 }
 
 val TOP_LEVEL_DESTINATIONS = listOf(
