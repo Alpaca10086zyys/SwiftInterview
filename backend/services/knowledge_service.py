@@ -69,3 +69,4 @@ def delete_file_metadata(filename):
 
     save_metadata(data)
     return {"message": "删除成功"}
+

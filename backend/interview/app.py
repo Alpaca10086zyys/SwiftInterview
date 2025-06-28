@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify,send_from_directory
 from ai_interview3 import ask_one_question
 from user_audio import generate_audio_from_text
 from asr import ai_speech
+from prompt import get_depth_description
+from prompt import get_jumpiness_description
 import os
 
 app = Flask(__name__)
@@ -27,6 +29,21 @@ def modify_text():
     style = data.get("style")
     imp = data.get("imp")
     base_prompt = f"这是一场针对{job_title}岗位的面试，你作为面试官，你的风格是{style},你的关注重点是{imp},请你开始问问题"
+    return base_prompt
+
+@app.route('/modify-text_new', methods=['POST'])
+def modify_text_new():
+    global base_prompt  # 使用 global 关键字修改全局变量
+    # 从请求中获取指令
+    data = request.json
+    job_title = data.get("job_title")
+    style = data.get("style")
+    imp = data.get("imp")
+    jumpiness_level = data.get("jumpiness_level")  # 获取思维跳跃程度
+    question_count = data.get("depth")
+    jumpiness = get_jumpiness_description(jumpiness_level)
+    depth = get_depth_description(question_count)
+    base_prompt = f"这是一场针对{job_title}岗位的面试，你作为面试官，你的风格是{style},你的关注重点是{imp},思维跳跃程度是{jumpiness},问题深度是{depth},请你开始问问题"
     return base_prompt
 
 @app.route('/start_interview', methods=['POST'])
