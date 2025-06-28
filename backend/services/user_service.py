@@ -2,7 +2,7 @@ import requests
 from flask import current_app
 
 def insert_user(data):
-    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/user"
+    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users"
     headers = {
         "apikey": current_app.config["SUPABASE_KEY"],
         "Authorization": f"Bearer {current_app.config['SUPABASE_KEY']}",
@@ -18,7 +18,7 @@ def insert_user(data):
 
 
 def delete_user(user_id):
-    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/user?id=eq.{user_id}"
+    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users?id=eq.{user_id}"
     headers = {
         "apikey": current_app.config["SUPABASE_KEY"],
         "Authorization": f"Bearer {current_app.config['SUPABASE_KEY']}"
