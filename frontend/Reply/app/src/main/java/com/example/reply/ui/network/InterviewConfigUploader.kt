@@ -10,6 +10,8 @@ object InterviewConfigUploader {
         job: String,
         style: String,
         focus: List<String>,
+        thinkingJump: Int,
+        depth: Int,
         serverUrl: String,
         onResult: (success: Boolean, response: String?) -> Unit
     ) {
@@ -17,6 +19,8 @@ object InterviewConfigUploader {
             put("job_title", job)
             put("style", style)
             put("imp", focus.joinToString("、"))
+            put("jumpiness_level",thinkingJump)
+            put("depth",depth)
         }
 
         val client = OkHttpClient()

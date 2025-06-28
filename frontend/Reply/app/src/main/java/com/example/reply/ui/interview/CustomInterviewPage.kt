@@ -19,11 +19,14 @@ import com.example.reply.ui.network.InterviewConfigUploader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomInterviewPage(onStartInterview: () -> Unit = {}) {
+fun CustomInterviewPage(onStartInterview: (String) -> Unit = {}) {
     var job by remember { mutableStateOf<String?>(null) }
     var style by remember { mutableStateOf<String?>(null) }
     val focusOptions = listOf("项目经历", "基础知识", "行业理解", "应变能力", "沟通表达", "逻辑思维")
     val selectedFocus = remember { mutableStateListOf<String>() }
+    var thinkingJumpLevel by remember { mutableStateOf(5f) }
+    var questionDepth by remember { mutableStateOf(5f) }
+
 
 
     Scaffold(
@@ -132,6 +135,77 @@ fun CustomInterviewPage(onStartInterview: () -> Unit = {}) {
                     }
                 }
             }
+            Divider(modifier = Modifier.padding(vertical = 16.dp))
+
+            // 思维跳跃程度
+            SectionCard(title = "思维跳跃程度") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+                    Slider(
+                        value = thinkingJumpLevel,
+                        onValueChange = { thinkingJumpLevel = it },
+                        valueRange = 1f..10f,
+                        steps = 8, // (10 - 1 - 1)
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        "当前选择：${thinkingJumpLevel.toInt()}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.align(Alignment.End)
+                    )
+                }
+            }
+
+            Divider(modifier = Modifier.padding(vertical = 16.dp))
+
+            // 问题深度
+            SectionCard(title = "问题深度") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+                    Slider(
+                        value = questionDepth,
+                        onValueChange = { questionDepth = it },
+                        valueRange = 1f..10f,
+                        steps = 8,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        "当前选择：${questionDepth.toInt()}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.align(Alignment.End)
+                    )
+                }
+            }
+
+            Divider(modifier = Modifier.padding(vertical = 16.dp))
+            // 面试方式
+            var interviewMode by remember { mutableStateOf("语音面试") } // 默认值
+
+
+            SectionCard(title = "面试方式") {
+                listOf("语音面试", "文字面试").forEach { option ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clickable { interviewMode = option },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = interviewMode == option,
+                            onClick = { interviewMode = option }
+                        )
+                        Text(option, style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
+
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -157,12 +231,13 @@ fun CustomInterviewPage(onStartInterview: () -> Unit = {}) {
                             job = job ?: "",
                             style = style ?: "",
                             focus = selectedFocus,
-                            serverUrl = "http://192.168.0.104:5000/modify-text" //"http://100.84.252.55:5000/modify-text" 
-
+                            thinkingJump = thinkingJumpLevel.toInt(),
+                            depth = questionDepth.toInt(),
+                            serverUrl = "http://192.168.0.100:5000/modify-text_new" //"http://100.84.252.55:5000/modify-text"
                         ) { success, response ->
                             Log.d("Upload", "Success=$success, Response=$response")
                             if (success) {
-                                onStartInterview()
+                                onStartInterview(interviewMode)
                             }
                         }
                     }

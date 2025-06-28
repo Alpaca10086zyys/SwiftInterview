@@ -26,6 +26,12 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
     namespace = "com.example.reply"
 
+    packaging {
+        resources {
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.reply"
         minSdk = libs.versions.minSdk.get().toInt()
@@ -97,6 +103,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.compose.testing)
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)

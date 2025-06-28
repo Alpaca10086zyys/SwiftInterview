@@ -80,7 +80,7 @@ fun QuestionPage(onExitInterview: () -> Unit) {
         ) {
             val (imageRef, buttonRef) = createRefs()
 
-            // 🤖 机器人动画
+            // 机器人动画
             Image(
                 painter = painterResource(id = R.drawable.robot),
                 contentDescription = "Robot",
@@ -133,7 +133,7 @@ fun QuestionPage(onExitInterview: () -> Unit) {
                             if (!interviewStarted) {
                                 isPlaying = true
                                 InterviewStarter.startInterview(
-                                    serverUrl = "http://192.168.0.104:5000/start_interview"
+                                    serverUrl = "http://192.168.0.100:5000/start_interview"
                                 ) { success, _, audioUrl ->
                                     if (success && audioUrl != null) {
                                         val fullUrl = "http://192.168.0.104:5000$audioUrl"
@@ -166,10 +166,10 @@ fun QuestionPage(onExitInterview: () -> Unit) {
                                 file?.let {
                                     AudioUploader.uploadAudio(
                                         it,
-                                        serverUrl = "http://192.168.0.104:5000/upload_audio_final"
+                                        serverUrl = "http://192.168.0.100:5000/upload_audio_final"
                                     ) { success, newAudioUrl ->
                                         if (success && newAudioUrl != null) {
-                                            val fullUrl = "http://192.168.0.104:5000$newAudioUrl"
+                                            val fullUrl = "http://192.168.0.100:5000$newAudioUrl"
                                             try {
                                                 mediaPlayer?.release()
                                                 mediaPlayer = MediaPlayer().apply {

@@ -7,7 +7,8 @@ import com.example.reply.ui.EmptyComingSoon
 enum class InterviewPage {
     Entry,
     CustomInterview,
-    ChatInterview// 后续扩展
+    ChatInterview,
+    VoiceInterview
 }
 
 @Composable
@@ -20,12 +21,22 @@ fun InterviewScreen() {
         })
 
         InterviewPage.CustomInterview -> CustomInterviewPage(
-            onStartInterview = {
-                currentPage = InterviewPage.ChatInterview
+            onStartInterview = { mode ->
+                currentPage = if (mode == "文字面试") {
+                    InterviewPage.ChatInterview
+                } else {
+                    InterviewPage.VoiceInterview
+                }
             }
         )
 
-        InterviewPage.ChatInterview -> QuestionPage(
+//        InterviewPage.ChatInterview -> QuestionPage(
+//            onExitInterview = { currentPage = InterviewPage.Entry }
+//        )
+
+        InterviewPage.ChatInterview ->InterviewChatPage()
+
+        InterviewPage.VoiceInterview -> QuestionPage(
             onExitInterview = { currentPage = InterviewPage.Entry }
         )
     }
