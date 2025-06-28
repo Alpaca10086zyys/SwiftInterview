@@ -2,7 +2,7 @@ import requests
 from flask import current_app
 
 def insert_user(data):
-    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/user"
+    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users"
     headers = {
         "apikey": current_app.config["SUPABASE_KEY"],
         "Authorization": f"Bearer {current_app.config['SUPABASE_KEY']}",
@@ -18,10 +18,40 @@ def insert_user(data):
 
 
 def delete_user(user_id):
-    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/user?id=eq.{user_id}"
+    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users?id=eq.{user_id}"
     headers = {
         "apikey": current_app.config["SUPABASE_KEY"],
         "Authorization": f"Bearer {current_app.config['SUPABASE_KEY']}"
     }
     res = requests.delete(url, headers=headers)
     return res.status_code, res.text if res.status_code != 204 else {"message": "Deleted"}
+
+
+def login_user(email, password):
+    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users?email=eq.{email}&select=id,password"
+    headers = {
+        "apikey": current_app.config["SUPABASE_KEY"],
+        "Authorization": f"Bearer {current_app.config['SUPABASE_KEY']}",
+    }
+
+    res = requests.get(url, headers=headers)
+
+    try:
+        users = res.json()
+        print(users)
+    except Exception:
+        return 500, {
+            "message": "Invalid Supabase response"
+        }
+
+    if res.status_code != 200:
+        return res.status_code, {"message": "Failed to query Supabase"}
+
+    if not users:
+        return 404, {"message": "User not found"}
+
+    user = users[0]
+    if user["password"] != password:
+        return 401, {"message": "Incorrect password"}
+
+    return 200, {"id": user["id"], "message": "Login successful"}

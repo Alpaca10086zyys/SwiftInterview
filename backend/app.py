@@ -9,7 +9,7 @@ def create_app():
     app.config.from_object(Config)
 
     CORS(app)
-    app.register_blueprint(knowledge_bp, url_prefix='/api')
+    app.register_blueprint(knowledge_bp)
     app.register_blueprint(user_bp)
 
     return app

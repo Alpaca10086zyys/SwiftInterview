@@ -6,7 +6,7 @@ from utils.embedding.text_embedder import embed_txt_file,get_embedding
 from utils.supabase_client import get_supabase
 import time
 
-knowledge_bp = Blueprint('knowledge', __name__)
+knowledge_bp = Blueprint('knowledge', __name__, url_prefix="/api/knowledge")
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt', 'png', 'jpg', 'jpeg','json'}
 
