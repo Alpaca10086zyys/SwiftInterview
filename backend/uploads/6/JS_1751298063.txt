@@ -1,0 +1,396 @@
+JS事件监听
+在 JavaScript 中，监听事件通常使用 addEventListener() 方法。该方法用于在指定的元素上注册事件监听器，允许你在特定事件发生时执行一个回调函数。
+基本语法：
+element.addEventListener(event, callback, [options]);
+- element：你希望绑定事件的目标 DOM 元素。
+- event：事件的名称（如 'click', 'resize', 'keydown' 等）。
+- callback：当事件发生时要执行的函数。
+- [options]：可选参数，用于指定事件的附加配置，具体配置选项如下。
+1. 事件类型（event）
+常见的事件类型有：
+- 鼠标事件： 
+  - 'click'：点击事件。
+  - 'dblclick'：双击事件。
+  - 'mousedown'：鼠标按下事件。
+  - 'mouseup'：鼠标抬起事件。
+  - 'mouseover'：鼠标悬停在元素上事件。
+  - 'mouseout'：鼠标移出元素事件。
+- 键盘事件： 
+  - 'keydown'：按键按下事件。
+  - 'keyup'：按键释放事件。
+  - 'keypress'：按键输入事件。
+- 表单事件： 
+  - 'submit'：表单提交事件。
+  - 'change'：表单元素值发生变化时触发事件。
+  - 'input'：用户输入时触发事件。
+- 视口事件： 
+  - 'resize'：窗口大小变化时触发。
+  - 'scroll'：页面滚动时触发。
+- 触摸事件（移动端）： 
+  - 'touchstart'：触摸开始。
+  - 'touchend'：触摸结束。
+2. 示例：添加事件监听
+点击事件
+const button = document.getElementById('myButton');
+button.addEventListener('click', function() {
+  alert('按钮被点击了！');
+});
+窗口大小变化时的事件
+window.addEventListener('resize', function() {
+  console.log('窗口大小发生变化');
+});
+键盘按下事件
+document.addEventListener('keydown', function(event) {
+  console.log(
+按下了键：${event.key}
+);
+});
+3. 事件冒泡与事件捕获
+- 事件冒泡（默认）：事件从目标元素冒泡到最顶层的元素。即从具体的元素逐层传播到根元素（document 或 window）。
+- 事件捕获：事件从根元素捕获并逐层传递到目标元素。
+你可以使用 addEventListener 的第三个参数来控制事件的传播阶段。默认情况下，事件是通过冒泡方式处理的。如果希望事件通过捕获阶段触发，可以设置第三个参数为 true。
+element.addEventListener('click', function() {
+  console.log('捕获到点击事件');
+}, true); // true 表示捕获阶段触发事件
+4. 移除事件监听器
+如果你想要移除已注册的事件监听器，可以使用 removeEventListener() 方法。它的语法与 addEventListener() 相同。
+element.removeEventListener('click', callback);
+注意：
+- removeEventListener() 需要传递相同的事件类型和回调函数，才能正确移除监听。
+- 如果你使用的是匿名函数（如 function() {}），则无法移除该事件监听器，必须使用具名函数。
+5. once 选项
+如果你只希望事件处理器在事件触发一次后执行并移除，可以使用 once 配置项：
+element.addEventListener('click', function() {
+  console.log('事件只会触发一次');
+}, { once: true });
+6. passive 选项
+当处理滚动事件时，可以使用 passive: true 来告诉浏览器这个事件处理器不会调用 preventDefault()，从而提高性能。它特别有用于 scroll 事件：
+window.addEventListener('scroll', function() {
+  console.log('页面滚动');
+}, { passive: true });
+7. stopPropagation 和 preventDefault
+- event.stopPropagation()：阻止事件进一步传播（不再冒泡）。
+- event.preventDefault()：阻止事件的默认行为（例如：阻止链接跳转、表单提交等）。
+element.addEventListener('click', function(event) {
+  event.stopPropagation(); // 阻止事件冒泡
+  event.preventDefault(); // 阻止默认行为
+});
+总结
+- 使用 addEventListener 可以绑定多个事件监听器，并控制事件的传播阶段（捕获、冒泡）。
+- 通过 removeEventListener 可以移除事件监听器。
+- 可以使用 once 配置让事件只触发一次，使用 passive 提升性能，特别是对滚动事件。
+- 通过 stopPropagation 和 preventDefault 可以控制事件的传播和默认行为。
+JS数据结构
+1. 数组 (Array)
+概述：
+- 数组是存储多个值的有序集合。它们可以包含任何类型的元素，包括基本类型、对象或其他数组。
+常用方法：
+- push(): 向数组末尾添加一个或多个元素。
+- pop(): 移除并返回数组的最后一个元素。
+- shift(): 移除并返回数组的第一个元素。
+- unshift(): 向数组的开头添加一个或多个元素。
+- forEach(): 遍历数组的每个元素。
+- map(): 创建一个新数组，数组的元素是原数组元素调用函数后的结果。
+示例：
+let arr = [1, 2, 3, 4];
+// 添加元素
+arr.push(5);  // [1, 2, 3, 4, 5]
+// 移除元素
+arr.pop();    // 5
+console.log(arr);  // [1, 2, 3, 4]
+// 遍历
+arr.forEach((item) => console.log(item));  // 1 2 3 4
+// 映射新数组
+let doubled = arr.map(x => x * 2);
+console.log(doubled);  // [2, 4, 6, 8]
+2. 对象 (Object)
+概述：
+- 对象是键值对（property-value）的集合，通常用于表示实体和其属性。
+常用方法：
+- 直接使用键来访问和修改值。
+- Object.keys(): 获取对象的所有键。
+- Object.values(): 获取对象的所有值。
+- Object.entries(): 获取对象的键值对数组。
+示例：
+let person = {
+    name: "Alice",
+    age: 30
+};
+// 访问和修改属性
+console.log(person.name);  // Alice
+person.age = 31;
+console.log(person.age);   // 31
+// 获取所有键
+console.log(Object.keys(person));  // ["name", "age"]
+// 获取所有值
+console.log(Object.values(person));  // ["Alice", 31]
+3. Map
+概述：
+- Map 是 JavaScript 中一种新的数据结构，类似于对象，但是它的键可以是任何类型，而不仅仅是字符串或符号。
+- Map 的键值对有插入顺序，可以按顺序迭代。
+常用方法：
+- set(key, value): 向 Map 添加一个键值对。
+- get(key): 获取指定键对应的值。
+- has(key): 检查 Map 是否包含指定的键。
+- delete(key): 删除指定的键值对。
+- clear(): 清空 Map。
+- size: 获取 Map 的大小（键值对的数量）。
+- forEach(): 遍历 Map 中的每个键值对。
+示例：
+let map = new Map();
+// 添加键值对
+map.set('name', 'Alice');
+map.set('age', 30);
+// 获取值
+console.log(map.get('name'));  // Alice
+// 检查是否存在某个键
+console.log(map.has('age'));   // true
+// 删除键值对
+map.delete('age');
+console.log(map.has('age'));   // false
+// 获取 Map 的大小
+console.log(map.size);  // 1
+// 遍历 Map
+map.forEach((value, key) => {
+    console.log(
+${key}: ${value}
+);
+});
+// 输出：name: Alice
+4. Set
+概述：
+- Set 是一个无重复值的集合，类似于数组，但它不会允许重复的元素。
+常用方法：
+- add(value): 向 Set 添加一个值。
+- has(value): 检查 Set 中是否存在某个值。
+- delete(value): 删除 Set 中的一个值。
+- clear(): 清空 Set。
+- size: 获取 Set 中元素的数量。
+- forEach(): 遍历 Set 中的每个元素。
+示例：
+let set = new Set();
+// 添加元素
+set.add(1);
+set.add(2);
+set.add(2);  // 这个不会被添加
+// 检查元素是否存在
+console.log(set.has(1));  // true
+console.log(set.has(3));  // false
+// 删除元素
+set.delete(1);
+console.log(set.has(1));  // false
+// 获取 Set 的大小
+console.log(set.size);  // 1
+// 遍历 Set
+set.forEach(value => {
+    console.log(value);  // 2
+});
+5. WeakMap
+概述：
+- WeakMap 是一种特殊的 Map，它的键是 弱引用，这意味着如果没有其他引用指向某个对象，垃圾回收器会自动清理该对象。
+- 这使得 WeakMap 特别适用于缓存或存储大量对象时，确保不会阻止垃圾回收。
+常用方法：
+- set(key, value): 向 WeakMap 添加一个键值对。
+- get(key): 获取指定键对应的值。
+- has(key): 检查 WeakMap 是否包含指定的键。
+- delete(key): 删除指定的键值对。
+示例：
+let weakMap = new WeakMap();
+let obj = {};
+weakMap.set(obj, 'some value');
+console.log(weakMap.get(obj));  // 'some value'
+obj = null;  // 使得 obj 不再被引用，弱引用会被垃圾回收
+// 此时 obj 相关的数据可能已经被清除
+console.log(weakMap.get(obj));  // undefined
+总结：
+- Array: 有序列表，常用于存储多个元素。
+- Object: 键值对集合，适合存储具有明确属性的对象。
+- Map: 键值对集合，支持任何类型的键，且能保持插入顺序。
+- Set: 无重复值的集合，常用于检查元素是否存在或去重。
+- WeakMap: 和 Map 类似，但是它的键是弱引用，适合存储大量对象的引用而不阻止垃圾回收。
+这些数据结构是 JavaScript 中非常重要且常用的工具，可以帮助你高效地组织和操作数据。
+
+
+Js技巧
+防抖
+_.debounce() 是 lodash 提供的一个防抖（debounce）函数，常用于限制函数的执行频率，尤其在输入框监听、窗口调整、按钮点击等高频事件中非常有用。
+
+---
+1. _.debounce 的作用
+- 防止函数被频繁调用，只在一段时间后执行最新的一次调用。
+- 常见应用场景
+  - 输入框搜索（用户输入完一段时间后才发送请求）
+  - 窗口大小调整（只在用户停止调整后执行）
+  - 按钮点击（防止按钮被短时间内多次点击）
+
+---
+2. _.debounce() 语法
+_.debounce(func, wait, [options])
+参数说明
+暂时无法在南开飞书文档外展示此内容
+options 可选配置
+暂时无法在南开飞书文档外展示此内容
+
+---
+3. _.debounce() 示例
+🚀 示例 1：输入框搜索
+👉 用户输入后等待 500ms 再搜索
+const search = _.debounce((query) => {
+    console.log(搜索: ${query});
+}, 500);
+document.getElementById("searchInput").addEventListener("input", (event) => {
+    search(event.target.value);
+});
+🔹 用户输入时，不会立即触发搜索，只有停止输入 500ms 之后才会执行搜索请求。
+
+---
+🚀 示例 2：窗口大小调整
+👉 避免 resize 事件触发过多次
+window.addEventListener("resize", _.debounce(() => {
+    console.log("窗口大小变化");
+}, 300));
+🔹 用户频繁调整窗口大小时，只有调整停止 300ms 之后才会触发 console.log("窗口大小变化")。
+
+---
+🚀 示例 3：按钮点击防抖
+👉 防止用户短时间内多次点击
+const handleClick = _.debounce(() => {
+    console.log("按钮点击");
+}, 1000, { leading: true, trailing: false });
+document.getElementById("myButton").addEventListener("click", handleClick);
+🔹 按钮第一次点击立即触发，但1 秒内的后续点击会被忽略。
+
+---
+4. leading 和 trailing 选项
+🚀 示例 4：leading: true
+👉 立即执行，然后进入防抖状态
+const log = _.debounce(() => console.log("执行"), 1000, { leading: true });
+log(); // 立即执行
+log(); // 1s 内不会执行
+log(); // 1s 内不会执行
+🔹 特点
+- 第一次调用立即执行
+- 后续 1s 内的调用全部忽略
+
+---
+🚀 示例 5：trailing: false
+👉 仅 leading: true，不会在等待结束后再执行
+const log = _.debounce(() => console.log("执行"), 1000, { leading: true, trailing: false });
+log(); // 立即执行
+log(); // 1s 内不会执行
+setTimeout(log, 1500); // 1.5s 后可以再次执行
+🔹 特点
+- 立即执行 (leading: true)
+- 不会在 1s 结束后再执行 (trailing: false)
+
+---
+5. _.debounce() vs _.throttle()
+暂时无法在南开飞书文档外展示此内容
+🚀 示例：_.throttle()
+const log = _.throttle(() => console.log("触发"), 1000);
+window.addEventListener("scroll", log);
+🔹 每 1 秒执行一次，即使用户一直滚动。
+
+---
+1. 总结
+- _.debounce() 适用于防止高频调用，只在停止触发后的一段时间后执行。
+- leading: true 立即执行第一次调用，但后续调用仍然受防抖限制。
+- trailing: false 不会在等待时间结束后再执行。
+- _.debounce() vs _.throttle()
+  - _.debounce() 适用于输入框搜索、防止按钮连点。
+  - _.throttle() 适用于滚动事件、鼠标拖动、固定时间内执行任务。
+🔹 推荐使用场景
+暂时无法在南开飞书文档外展示此内容
+
+---
+🔥 现在，你可以在你的项目中灵活使用 _.debounce() 来优化性能啦！
+如果你要手写一个 防抖（debounce） 函数，可以按照以下思路实现：
+防抖（debounce）原理
+- 连续触发事件时，只执行最后一次操作，避免高频触发导致的性能问题（如输入框变化、窗口缩放等）。
+- 通常使用 setTimeout 来延迟执行，在规定时间内如果再次触发，则清除之前的定时器，重新计时。
+
+---
+🤩手写防抖（debounce）函数
+function debounce(fn, delay) {
+    let timer = null; // 用于存储定时器
+    return function (...args) {
+        const context = this; // 保留 this 指向
+        if (timer) clearTimeout(timer); // 清除上一次的定时器
+        timer = setTimeout(() => {
+            fn.apply(context, args); // 执行原函数，保持 this 和参数
+        }, delay);
+    };
+}
+
+/**
+ * const log = debounce(console.log, 100);
+ * log('Hello'); // cancelled
+ * log('Hello'); // cancelled
+ * log('Hello'); // Logged at t=100ms
+ */
+
+---
+使用示例
+1. 防止输入框触发太频繁
+const input = document.getElementById("search");
+input.addEventListener("input", debounce((event) => {
+    console.log("搜索内容：", event.target.value);
+}, 500));
+💡 解释：如果用户连续输入，每次都会清除之前的 setTimeout，只有停止输入 500ms 后才会触发 console.log。
+
+---
+2. 监听 resize 事件，避免频繁触发
+window.addEventListener("resize", debounce(() => {
+    console.log("窗口大小改变");
+}, 300));
+💡 解释：浏览器窗口缩放时，每次调整都会重置计时器，只有用户停止调整 300ms 后才执行 console.log。
+
+---
+支持立即执行的防抖（leading edge debounce）
+有时候，我们希望第一次触发时立即执行，然后进入防抖状态：
+function debounce(fn, delay, immediate = false) {
+    let timer = null;
+    return function (...args) {
+        const context = this;
+        const callNow = immediate && !timer; // 是否立即执行
+        if (timer) clearTimeout(timer); // 清除上一次的定时器
+        timer = setTimeout(() => {
+            timer = null;
+            if (!immediate) fn.apply(context, args); // 如果不是立即执行，则执行函数
+        }, delay);
+        if (callNow) fn.apply(context, args); // 立即执行一次
+    };
+}
+立即执行防抖示例
+document.addEventListener("scroll", debounce(() => {
+    console.log("滚动触发");
+}, 500, true)); // 立即触发一次
+💡 解释：immediate = true，意味着第一次滚动就触发 console.log，然后 500ms 内不再执行。
+
+---
+对比 throttle（节流）
+如果你的需求是保证函数在固定时间间隔执行，可以用节流（throttle）：
+function throttle(fn, delay) {
+    let lastTime = 0;
+    return function (...args) {
+        const now = Date.now();
+        if (now - lastTime >= delay) {
+            fn.apply(this, args);
+            lastTime = now;
+        }
+    };
+}
+🚀 节流适用于：
+- 监听滚动事件（scroll）
+- 鼠标移动事件（mousemove）
+- 固定时间间隔执行任务
+
+---
+总结
+暂时无法在南开飞书文档外展示此内容
+🎯 如果你的需求是：
+- 防止频繁调用（如用户搜索时连续输入） 👉 debounce ✅
+- 让事件在固定时间间隔内触发（如监听滚动、鼠标移动） 👉 throttle ✅
+你可以尝试在项目里使用 debounce，让交互更加流畅！🚀
+
+
