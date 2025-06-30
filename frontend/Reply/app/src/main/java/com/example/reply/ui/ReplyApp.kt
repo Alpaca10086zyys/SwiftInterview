@@ -16,8 +16,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
 import com.example.reply.ui.daliyquestion.DailyQuestionPage
-import com.example.reply.ui.interview.InterviewScreen
 import com.example.reply.ui.homepage.GroupsScreen
+import com.example.reply.ui.homepage.LoginScreen
+import com.example.reply.ui.homepage.RegisterScreen
+import com.example.reply.ui.interview.InterviewScreen
 import com.example.reply.ui.knowledgebase.KnowledgeBaseScreen
 import com.example.reply.ui.knowledgebase.UploadScreen
 import com.example.reply.ui.navigation.ReplyNavigationActions
@@ -124,10 +126,23 @@ private fun ReplyNavHost(
             DailyQuestionPage()
         }
         composable<Route.Groups> {
-            GroupsScreen()
+            GroupsScreen(navController) // 添加 navController 参数
         }
         composable<Route.Upload> {
             UploadScreen(navController)
         }
+        composable<Route.Login> {
+            LoginScreen(
+                onBackClicked = { navController.popBackStack() },
+                onRegisterClicked = { navController.navigate(Route.Register) }
+            )
+        }
+        composable<Route.Register> {
+            RegisterScreen(
+                onBackClicked = { navController.popBackStack() },
+                onLoginClicked = { navController.navigate(Route.Login) }
+            )
+        }
     }
 }
+

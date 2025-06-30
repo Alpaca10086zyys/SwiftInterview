@@ -5,15 +5,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
+import com.example.reply.ui.navigation.Route
 
 // 定义页面枚举
 enum class GroupsPage {
     Main,
-    Login
+    Login,
+    Register
 }
 
 @Composable
-fun GroupsScreen() {  // 移除 navController 参数
+fun GroupsScreen(navController: NavHostController) {
     // 使用状态管理当前页面
     var currentPage by remember { mutableStateOf(GroupsPage.Main) }
 
@@ -22,7 +25,12 @@ fun GroupsScreen() {  // 移除 navController 参数
             onLoginClicked = { currentPage = GroupsPage.Login }
         )
         GroupsPage.Login -> LoginScreen(
-            onBackClicked = { currentPage = GroupsPage.Main }
+            onBackClicked = { currentPage = GroupsPage.Main },
+            onRegisterClicked = { currentPage = GroupsPage.Register }
+        )
+        GroupsPage.Register -> RegisterScreen(
+            onBackClicked = { currentPage = GroupsPage.Login },
+            onLoginClicked = { currentPage = GroupsPage.Login }
         )
     }
 }

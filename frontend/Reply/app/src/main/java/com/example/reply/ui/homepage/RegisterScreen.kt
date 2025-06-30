@@ -31,28 +31,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     onBackClicked: () -> Unit,
-    onRegisterClicked: () -> Unit // 新增：点击注册的回调
+    onLoginClicked: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
+    var nickname by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) } // 控制密码是否可见
+    var passwordVisible by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "登录") },
+                title = { Text(text = "注册") },
                 navigationIcon = {
                     IconButton(onClick = onBackClicked) {
                         Icon(
@@ -83,6 +81,15 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
+                value = nickname,
+                onValueChange = { nickname = it },
+                label = { Text("昵称") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("密码") },
@@ -94,7 +101,6 @@ fun LoginScreen(
                         Icons.Filled.Visibility
                     else Icons.Filled.VisibilityOff
 
-                    // 请为图标提供内容描述
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, contentDescription = "切换密码可见性")
                     }
@@ -104,32 +110,32 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { /* 处理登录 */ },
+                onClick = { /* 处理注册 */ },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "登录")
+                Text(text = "注册")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 添加注册提示和链接
+            // 添加登录提示和链接
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "没有账户？",
+                    text = "已有账户？",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 TextButton(
-                    onClick = onRegisterClicked,
+                    onClick = onLoginClicked,
                     modifier = Modifier.padding(0.dp)
                 ) {
                     Text(
-                        text = "去注册",
+                        text = "去登录",
                         style = MaterialTheme.typography.bodySmall.copy(
                             textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
                             color = MaterialTheme.colorScheme.primary

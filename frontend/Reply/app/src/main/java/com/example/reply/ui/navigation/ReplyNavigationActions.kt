@@ -21,6 +21,8 @@ sealed interface Route {
     @Serializable data object Articles : Route
     @Serializable data object Groups : Route
     @Serializable data object Upload : Route
+    @Serializable data object Login : Route
+    @Serializable data object Register : Route
 }
 
 data class ReplyTopLevelDestination(val route: Route, val selectedIcon: ImageVector, val unselectedIcon: ImageVector, val iconTextId: Int)
