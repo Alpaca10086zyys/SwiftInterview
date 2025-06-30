@@ -136,7 +136,7 @@ fun QuestionPage(onExitInterview: () -> Unit) {
                                     serverUrl = "http://192.168.0.100:5000/start_interview"
                                 ) { success, _, audioUrl ->
                                     if (success && audioUrl != null) {
-                                        val fullUrl = "http://192.168.0.104:5000$audioUrl"
+                                        val fullUrl = "http://192.168.0.100:5000$audioUrl"
                                         mediaPlayer?.release()
                                         mediaPlayer = MediaPlayer().apply {
                                             setDataSource(fullUrl)

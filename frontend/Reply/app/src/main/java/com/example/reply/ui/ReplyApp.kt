@@ -15,6 +15,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
+import com.example.reply.ui.daliyquestion.DailyQuestionPage
 import com.example.reply.ui.interview.InterviewScreen
 import com.example.reply.ui.homepage.GroupsScreen
 import com.example.reply.ui.knowledgebase.KnowledgeBaseScreen
@@ -120,7 +121,7 @@ private fun ReplyNavHost(
             KnowledgeBaseScreen(navController)
         }
         composable<Route.Articles> {
-            EmptyComingSoon()
+            DailyQuestionPage()
         }
         composable<Route.Groups> {
             GroupsScreen()

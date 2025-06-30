@@ -91,6 +91,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+
+        isCoreLibraryDesugaringEnabled = true
+
     }
 
     kotlinOptions {
@@ -104,6 +107,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.compose.testing)
+    implementation(libs.material)
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -135,7 +139,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.core)
