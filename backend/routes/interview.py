@@ -22,7 +22,7 @@ log_file_path = ""  # 记录当前会话日志文件路径
 
 @app.route('/')
 def index():
-    return app.send_static_file('index_final.html')  # 保证 index.html 是静态文件夹里的
+    return app.send_static_file('index_text.html')  # 保证 index.html 是静态文件夹里的
 
 
 # 声明 base_prompt 为全局变量
@@ -96,11 +96,19 @@ def upload_audio():
 
 @app.route('/start_text_interview', methods=['POST'])
 def start_text_interview():
-    global base_prompt  # 使用 global 关键字访问和修改全局变量
+    global base_prompt, log_file_path  # 使用 global 关键字访问和修改全局变量
     if not base_prompt:
         base_prompt = "你作为面试官，请开始提问。"
     first_question = ask_one_question(base_prompt)
+    # 生成日志文件名：面试+时间.txt
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"面试_{timestamp}.txt"
+    log_file_path = os.path.join(app.config['INTERVIEW_LOG_FOLDER'], filename)
 
+    # 记录第一条问题
+    with open(log_file_path, 'w', encoding='utf-8') as f:
+        log_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        f.write(f"{log_time} 大模型：{first_question}\n")
     # 返回第一个问题和音频URL
     return jsonify({
         'next_question': first_question,
@@ -108,11 +116,17 @@ def start_text_interview():
 
 @app.route('/last_text_question', methods=['POST'])
 def last_text_question():
-    global base_prompt  # 使用 global 关键字访问和修改全局变量
+    global base_prompt, log_file_path  # 使用 global 关键字访问和修改全局变量
     data = request.json
     input_list = data.get("text")
     base_prompt = f"{base_prompt}, 上一个问题用户的回答是{input_list}"
     last_question = ask_one_question(base_prompt)
+    # 记录用户回答和新的问题
+    log_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if log_file_path:
+        with open(log_file_path, 'a', encoding='utf-8') as f:
+            f.write(f"{log_time} 用户：{input_list}\n")
+            f.write(f"{log_time} 大模型：{last_question}\n")
     return jsonify({
         'next_question': last_question
     })
