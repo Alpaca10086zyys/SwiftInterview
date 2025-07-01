@@ -2,7 +2,7 @@ import wave
 import io
 import os
 
-from examples import TTS, AueType
+from .examples import TTS, AueType
 
 
 class ShortTTS(object):
@@ -62,6 +62,7 @@ def pcm2wav(pcmdata: bytes, channels=1, bits=16, sample_rate=24000):
 
 # 函数：传入文本并生成音频文件
 def generate_audio_from_text(text, vcn='xiaofu', engineid='short_audio_synthesis_jovi'):
+    print(f"[DEBUG] 待合成文字: {text}")
     input_params = {
         'app_id': '2025790177',
         'app_key': 'QyPmFFzeoZRKqrCO',

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from websocket import create_connection, ABNF
 import time
-from auth_util import gen_sign_headers
+from .auth_util import gen_sign_headers
 import base64
 import json
 import os

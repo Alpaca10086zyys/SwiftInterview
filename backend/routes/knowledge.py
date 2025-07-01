@@ -15,7 +15,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@knowledge_bp.route('/knowledge/upload', methods=['POST'])
+@knowledge_bp.route('/upload', methods=['POST'])
 def upload_file():
     """
     客户端上传文件到服务端，json格式：
@@ -46,7 +46,7 @@ def upload_file():
     file_path = os.path.join(user_folder, final_filename)
     file.save(file_path)
 
-    save_file_metadata(final_filename, file_path, user_id)
+    # save_file_metadata(final_filename, file_path, user_id)
 
     supabase = get_supabase()
     try:
@@ -72,7 +72,7 @@ def upload_file():
         "user_id": user_id
     })
 
-@knowledge_bp.route('/knowledge/delete', methods=['POST'])
+@knowledge_bp.route('/delete', methods=['POST'])
 def delete_file():
     """
     请求格式：
@@ -121,15 +121,81 @@ def delete_file():
     })
 
 
-@knowledge_bp.route('/knowledge/list', methods=['GET'])
+@knowledge_bp.route('/list', methods=['GET'])
 def list_files():
-    return jsonify(get_all_files())
+    """
+     前端调用示例：
+        GET /api/knowledge/list?user_id=abc123
+     返回：
+        [
+          {
+            "id": 17,
+            "user_id": "abc123",
+            "filename": "note_1729999999.txt",
+            "filepath": "uploads/abc123/note_1729999999.txt",
+            "created_at": "2025-06-30T14:22:10.123456+00:00"
+          },
+          ...
+        ]
+    :return:
+    """
+    # 1) 取查询参数
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"error": "缺少 user_id"}), 400
 
-@knowledge_bp.route('/knowledge/download/<filename>', methods=['GET'])
-def download_file(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+    supabase = get_supabase()
 
-@knowledge_bp.route('/knowledge/search', methods=['POST'])
+    try:
+        # 2) 查询 files 表中属于该用户的全部记录
+        #    按 created_at 升序；如需倒序改为 desc=True
+        res = (
+            supabase
+            .table("files")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("created_at")  # ➜ 按时间排序，默认 asc=True
+            .execute()
+        )
+        data = res.data or []  # res.data 为空时返回 []
+    except Exception as e:
+        return jsonify({"error": f"查询失败：{str(e)}"}), 500
+
+    # 3) 直接把查询结果作为 JSON 发回前端
+    return jsonify(data), 200
+
+@knowledge_bp.route('/download', methods=['GET'])
+def download_file():
+    """
+    根据 file_id 从 Supabase 查询文件路径，然后返回文件
+    """
+    file_id = request.args.get("file_id")
+    supabase = get_supabase()
+
+    try:
+        # 1. 查询 Supabase 数据库，获取该文件的路径和原始文件名
+        res = supabase.table("files").select("filepath, filename").eq("id", file_id).single().execute()
+        if not res.data:
+            return jsonify({"error": "找不到该文件"}), 404
+
+        filepath = res.data["filepath"]
+        filename = res.data["filename"]  # 可用于作为下载时的原名
+    except Exception as e:
+        return jsonify({"error": f"数据库查询失败: {str(e)}"}), 500
+
+    # 2. 确保文件存在
+    if not os.path.exists(filepath):
+        return jsonify({"error": f"文件不存在: {filepath}"}), 404
+
+    # 3. 计算目录与文件名
+    directory = os.path.dirname(filepath)
+    final_filename = os.path.basename(filepath)
+
+    # 4. 通过 Flask 内置的 send_from_directory 发送
+    return send_from_directory(directory, final_filename, as_attachment=True, download_name=filename)
+
+
+@knowledge_bp.route('/search', methods=['POST'])
 def search_files():
     """
     请求格式：

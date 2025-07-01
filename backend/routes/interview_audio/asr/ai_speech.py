@@ -6,7 +6,7 @@ import struct
 import json
 import time
 from websocket import create_connection
-from auth_util import gen_sign_headers
+from .auth_util import gen_sign_headers
 
 monkey.patch_all()
 NUM = 1
