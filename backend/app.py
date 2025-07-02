@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from routes.knowledge import knowledge_bp
 from routes.user import user_bp
+from routes.review import review_bp
 from config import Config
 from routes.interview import interview_bp
 from routes.interview_text import interview_text_bp
