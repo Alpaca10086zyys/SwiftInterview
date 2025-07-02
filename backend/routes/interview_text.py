@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from interview_text_wjj.interview_answer import answer_question
-from interview_text_wjj.interview_question import ask_one_question
+from routes.interview_text_wjj.interview_answer import answer_question
+from routes.interview_text_wjj.interview_question import ask_one_question
 
 interview_text_bp = Blueprint('interview_text', __name__, url_prefix='/api/text')
 
