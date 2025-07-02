@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify, send_from_directory
-from interview_audio.ai_interview3 import ask_one_question
-from interview_audio.user_audio import generate_audio_from_text
-from interview_audio.asr import ai_speech
-from interview_audio.prompt import get_depth_description, get_jumpiness_description
+from routes.interview_audio.ai_interview3 import ask_one_question
+from routes.interview_audio.user_audio import generate_audio_from_text
+from routes.interview_audio.asr import ai_speech
+from routes.interview_audio.prompt import get_depth_description, get_jumpiness_description
 import os
 from datetime import datetime
 
