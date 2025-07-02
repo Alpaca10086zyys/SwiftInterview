@@ -1,53 +1,36 @@
 package com.example.reply.ui.homepage
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.example.reply.network.ApiService
+import com.example.reply.data.UserData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onBackClicked: () -> Unit,
-    onRegisterClicked: () -> Unit // 新增：点击注册的回调
+    onRegisterClicked: () -> Unit,
+    onLoginSuccess: (UserData) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) } // 控制密码是否可见
+    var passwordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -94,20 +77,64 @@ fun LoginScreen(
                         Icons.Filled.Visibility
                     else Icons.Filled.VisibilityOff
 
-                    // 请为图标提供内容描述
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, contentDescription = "切换密码可见性")
                     }
                 }
             )
 
+            // 错误消息显示
+            if (!errorMessage.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = errorMessage ?: "",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { /* 处理登录 */ },
-                modifier = Modifier.fillMaxWidth()
+                onClick = {
+                    // 替换全角 ＠ 为半角 @
+                    val normalizedEmail = email.replace("＠", "@").trim()
+
+                    if (normalizedEmail.isEmpty() || password.isEmpty()) {
+                        errorMessage = "请输入邮箱和密码"
+                        return@Button
+                    }
+
+//                    // 超宽松的邮箱验证：只要有@符号就行
+//                    if (!normalizedEmail.contains("@")) {
+//                        errorMessage = "请输入有效的邮箱地址"
+//                        return@Button
+//                    }
+
+                    isLoading = true
+                    errorMessage = null
+
+                    // 使用处理后的邮箱
+                    ApiService.login(normalizedEmail, password) { success, user, message ->
+                        isLoading = false
+                        if (success && user != null) {
+                            onLoginSuccess(user)
+                        } else {
+                            errorMessage = message
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             ) {
-                Text(text = "登录")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Text(text = "登录")
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

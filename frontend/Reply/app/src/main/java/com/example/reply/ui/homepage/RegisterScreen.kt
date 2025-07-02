@@ -1,51 +1,37 @@
 package com.example.reply.ui.homepage
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.reply.network.ApiService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     onBackClicked: () -> Unit,
-    onLoginClicked: () -> Unit
+    onLoginClicked: () -> Unit,
+    onRegisterSuccess: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var nickname by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var successMessage by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -107,13 +93,72 @@ fun RegisterScreen(
                 }
             )
 
+            // 消息显示区域
+            if (!errorMessage.isNullOrEmpty() || !successMessage.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = errorMessage ?: successMessage ?: "",
+                    color = if (errorMessage != null) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { /* 处理注册 */ },
-                modifier = Modifier.fillMaxWidth()
+                onClick = {
+                    // 替换全角 ＠ 为半角 @
+                    val normalizedEmail = email.replace("＠", "@").trim()
+                    val trimmedNickname = nickname.trim()
+
+                    if (normalizedEmail.isEmpty() || password.isEmpty() || trimmedNickname.isEmpty()) {
+                        errorMessage = "请填写所有字段"
+                        successMessage = null
+                        return@Button
+                    }
+
+//                    // 超宽松邮箱验证：只要有@符号就行
+//                    if (!normalizedEmail.contains("@")) {
+//                        errorMessage = "请输入有效的邮箱地址"
+//                        successMessage = null
+//                        return@Button
+//                    }
+
+                    // 密码长度验证
+                    if (password.length < 6) {
+                        errorMessage = "密码长度至少6位"
+                        successMessage = null
+                        return@Button
+                    }
+
+                    isLoading = true
+                    errorMessage = null
+                    successMessage = null
+
+                    // 使用处理后的邮箱
+                    ApiService.register(normalizedEmail, password, trimmedNickname) { success, message ->
+                        isLoading = false
+                        if (success) {
+                            successMessage = "注册成功！"
+                            // 自动跳转到登录或直接登录
+                            onRegisterSuccess()
+                        } else {
+                            errorMessage = message
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             ) {
-                Text(text = "注册")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Text(text = "注册")
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

@@ -1,3 +1,4 @@
+// ReplyApp.kt
 package com.example.reply.ui
 
 import androidx.compose.material3.Surface
@@ -6,7 +7,9 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -15,6 +18,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
+import com.example.reply.data.UserData
 import com.example.reply.ui.daliyquestion.DailyQuestionPage
 import com.example.reply.ui.homepage.GroupsScreen
 import com.example.reply.ui.homepage.LoginScreen
@@ -77,6 +81,9 @@ fun ReplyApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    // 管理用户状态
+    var groupsUserData by remember { mutableStateOf<UserData?>(null) }
+
     Surface {
         ReplyNavigationWrapper(
             currentDestination = currentDestination,
@@ -91,6 +98,8 @@ fun ReplyApp(
                 closeDetailScreen = closeDetailScreen,
                 navigateToDetail = navigateToDetail,
                 toggleSelectedEmail = toggleSelectedEmail,
+                groupsUserData = groupsUserData,
+                onGroupsUserDataChange = { user -> groupsUserData = user } // 修复类型推断问题
             )
         }
     }
@@ -106,6 +115,8 @@ private fun ReplyNavHost(
     closeDetailScreen: () -> Unit,
     navigateToDetail: (Long, ReplyContentType) -> Unit,
     toggleSelectedEmail: (Long) -> Unit,
+    groupsUserData: UserData?,
+    onGroupsUserDataChange: (UserData?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -113,36 +124,40 @@ private fun ReplyNavHost(
         navController = navController,
         startDestination = Route.Inbox,
     ) {
-        composable<Route.Inbox> {
-            InterviewScreen()
-        }
-        composable<Route.DirectMessages> {
-            EmptyComingSoon()
-        }
-        composable<Route.Book> {
-            KnowledgeBaseScreen(navController)
-        }
-        composable<Route.Articles> {
-            DailyQuestionPage()
-        }
+        composable<Route.Inbox> { InterviewScreen() }
+        composable<Route.DirectMessages> { EmptyComingSoon() }
+        composable<Route.Book> { KnowledgeBaseScreen(navController) }
+        composable<Route.Articles> { DailyQuestionPage() }
         composable<Route.Groups> {
-            GroupsScreen(navController) // 添加 navController 参数
+            GroupsScreen(
+                navController = navController,
+                userData = groupsUserData,
+                onLogout = { onGroupsUserDataChange(null) }
+            )
         }
-        composable<Route.Upload> {
-            UploadScreen(navController)
-        }
+        composable<Route.Upload> { UploadScreen(navController) }
         composable<Route.Login> {
             LoginScreen(
                 onBackClicked = { navController.popBackStack() },
-                onRegisterClicked = { navController.navigate(Route.Register) }
+                onRegisterClicked = { navController.navigate(Route.Register) },
+                onLoginSuccess = { user: UserData ->
+                    onGroupsUserDataChange(user)
+                    navController.popBackStack() // 返回到上一个页面（Groups）
+                }
             )
         }
         composable<Route.Register> {
             RegisterScreen(
                 onBackClicked = { navController.popBackStack() },
-                onLoginClicked = { navController.navigate(Route.Login) }
+                onLoginClicked = { navController.navigate(Route.Login) },
+                onRegisterSuccess = {
+                    // 注册成功后导航到登录页面
+                    navController.navigate(Route.Login) {
+                        // 清除注册页面
+                        popUpTo(Route.Register) { inclusive = true }
+                    }
+                }
             )
         }
     }
 }
-
