@@ -3,7 +3,7 @@ import json
 import uuid
 import time
 import requests
-from auth_util import gen_sign_headers
+from utils.auth_util import gen_sign_headers
 
 # 请替换APP_ID、APP_KEY
 APP_ID = '2025790177'
