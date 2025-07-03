@@ -28,7 +28,7 @@ def delete_user(user_id):
 
 
 def login_user(email, password):
-    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users?email=eq.{email}&select=id,password"
+    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users?email=eq.{email}&select=*"
     headers = {
         "apikey": current_app.config["SUPABASE_KEY"],
         "Authorization": f"Bearer {current_app.config['SUPABASE_KEY']}",
@@ -54,4 +54,11 @@ def login_user(email, password):
     if user["password"] != password:
         return 401, {"message": "Incorrect password"}
 
-    return 200, {"id": user["id"], "message": "Login successful"}
+    return 200, {
+        "id": user["id"],
+        "created_at": user["created_at"],
+        "email": user["email"],
+        "user_name": user["user_name"],
+        "job_status": user["job_status"],
+        "message": "Login successful"
+    }
