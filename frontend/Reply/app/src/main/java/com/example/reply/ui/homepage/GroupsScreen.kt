@@ -13,7 +13,7 @@ fun GroupsScreen(
 ) {
     GroupsMainPage(
         onLoginClicked = {
-            // 直接使用 Route.Login 对象
+            // 使用 Route.Login 对象
             navController.navigate(Route.Login)
         },
         userData = userData,

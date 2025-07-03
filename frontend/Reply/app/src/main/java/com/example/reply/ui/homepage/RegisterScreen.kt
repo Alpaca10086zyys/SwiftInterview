@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.reply.data.UserData
 import com.example.reply.network.ApiService
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,7 +23,7 @@ import com.example.reply.network.ApiService
 fun RegisterScreen(
     onBackClicked: () -> Unit,
     onLoginClicked: () -> Unit,
-    onRegisterSuccess: () -> Unit
+    onRegisterSuccess: (UserData) -> Unit // 修改为接收 UserData
 ) {
     var email by remember { mutableStateOf("") }
     var nickname by remember { mutableStateOf("") }
@@ -118,13 +119,6 @@ fun RegisterScreen(
                         return@Button
                     }
 
-//                    // 超宽松邮箱验证：只要有@符号就行
-//                    if (!normalizedEmail.contains("@")) {
-//                        errorMessage = "请输入有效的邮箱地址"
-//                        successMessage = null
-//                        return@Button
-//                    }
-
                     // 密码长度验证
                     if (password.length < 6) {
                         errorMessage = "密码长度至少6位"
@@ -140,9 +134,16 @@ fun RegisterScreen(
                     ApiService.register(normalizedEmail, password, trimmedNickname) { success, message ->
                         isLoading = false
                         if (success) {
-                            successMessage = "注册成功！"
-                            // 自动跳转到登录或直接登录
-                            onRegisterSuccess()
+                            // 注册成功后自动登录
+                            ApiService.login(normalizedEmail, password) { loginSuccess, user, loginMessage ->
+                                if (loginSuccess && user != null) {
+                                    successMessage = "注册成功！"
+                                    // 自动跳转到个人主页
+                                    onRegisterSuccess(user)
+                                } else {
+                                    errorMessage = "注册成功，但自动登录失败: $loginMessage"
+                                }
+                            }
                         } else {
                             errorMessage = message
                         }

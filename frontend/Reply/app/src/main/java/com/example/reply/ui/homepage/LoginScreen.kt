@@ -15,8 +15,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.reply.network.ApiService
 import com.example.reply.data.UserData
+import com.example.reply.network.ApiService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,12 +105,6 @@ fun LoginScreen(
                         return@Button
                     }
 
-//                    // 超宽松的邮箱验证：只要有@符号就行
-//                    if (!normalizedEmail.contains("@")) {
-//                        errorMessage = "请输入有效的邮箱地址"
-//                        return@Button
-//                    }
-
                     isLoading = true
                     errorMessage = null
 
@@ -118,6 +112,7 @@ fun LoginScreen(
                     ApiService.login(normalizedEmail, password) { success, user, message ->
                         isLoading = false
                         if (success && user != null) {
+                            // 登录成功，导航到个人主页
                             onLoginSuccess(user)
                         } else {
                             errorMessage = message

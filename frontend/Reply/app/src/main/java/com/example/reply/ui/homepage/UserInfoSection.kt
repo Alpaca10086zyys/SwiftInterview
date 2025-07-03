@@ -52,7 +52,7 @@ fun UserInfoSection(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = userData.nickname,
+                        text = "${userData.nickname}",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
