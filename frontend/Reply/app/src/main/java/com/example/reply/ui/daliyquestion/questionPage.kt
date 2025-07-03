@@ -5,18 +5,25 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
@@ -48,17 +55,21 @@ import java.time.format.DateTimeFormatter
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 import java.net.URL
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,12 +79,15 @@ fun DailyQuestionPage() {
     val today = remember { LocalDate.now() }
     var selectedDate by remember { mutableStateOf(today) }
     var answerText by remember { mutableStateOf("") }
-    var questionText by remember { mutableStateOf("请解释Compose的工作原理？") }
+    var questionText by remember { mutableStateOf(" ") }
     var referenceAnswer by remember { mutableStateOf<String?>("未提供参考答案") }
     var userSubmittedAnswer by remember { mutableStateOf<String?>(null) }
     var showAnswerButton by remember { mutableStateOf(false) }
     var showAnswerCards by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    val hasLoadedOnce = remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
 
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日")
@@ -83,6 +97,7 @@ fun DailyQuestionPage() {
             initialDate = selectedDate,
             onDateSelected = {
                 selectedDate = it
+                hasLoadedOnce.value = false
                 showDatePicker = false
             },
             onDismiss = {
@@ -93,12 +108,15 @@ fun DailyQuestionPage() {
 
     // 每次日期变动时自动加载题目
     LaunchedEffect(selectedDate) {
-        fetchQuestionAndAnswerForDate(selectedDate) { q, a ->
-            questionText = q
-            referenceAnswer = a
-            userSubmittedAnswer = null
-            showAnswerButton = false
-            showAnswerCards = false
+        if (!hasLoadedOnce.value) {
+            hasLoadedOnce.value = true
+            fetchQuestionAndAnswerForDate(selectedDate) { q, a ->
+                questionText = q
+                referenceAnswer = a
+                userSubmittedAnswer = null
+                showAnswerButton = false
+                showAnswerCards = false
+            }
         }
     }
 
@@ -111,7 +129,7 @@ fun DailyQuestionPage() {
                             if (showAnswerCards) {
                                 showAnswerCards = false
                                 showAnswerButton = false
-                                answerText = userSubmittedAnswer ?: ""
+                                answerText = ""
                             }
                         },
                         enabled = showAnswerCards
@@ -145,6 +163,7 @@ fun DailyQuestionPage() {
                 Row(
                     modifier = Modifier
                         .padding(8.dp)
+                        .background(MaterialTheme.colorScheme.background)
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -161,20 +180,27 @@ fun DailyQuestionPage() {
                             userSubmittedAnswer = answerText
                             showAnswerButton = true
                             answerText = ""
+                            keyboardController?.hide()
                         }
                     ) {
-                        Icon(imageVector = Icons.Default.Send, contentDescription = "发送")
+                        Icon(
+                            imageVector = Icons.Default.Send,
+                            contentDescription = "发送",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+
                     }
                 }
             }
-        }
+        },
     ) { innerPadding ->
         // 日期
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -254,9 +280,25 @@ fun DailyQuestionPage() {
 }
 
 fun fetchQuestionAndAnswerForDate(date: LocalDate, onResult: (String, String) -> Unit) {
-    val client = OkHttpClient()
+    val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+
+    val json = JSONObject().apply {
+        put("date", date.toString()) // 如果你后端需要 date，可传；否则可以不传
+    }
+
+    val body = RequestBody.create(
+        "application/json; charset=utf-8".toMediaTypeOrNull(),
+        json.toString()
+    )
+
     val request = Request.Builder()
-        .url("http://<你的IP>:5000/daily_question?date=${date.toString()}") // 假设GET请求
+        .url("http://192.168.0.106:5000/api/text/start_interview")
+        .post(body)
         .build()
 
     client.newCall(request).enqueue(object : Callback {
@@ -272,6 +314,7 @@ fun fetchQuestionAndAnswerForDate(date: LocalDate, onResult: (String, String) ->
         }
     })
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

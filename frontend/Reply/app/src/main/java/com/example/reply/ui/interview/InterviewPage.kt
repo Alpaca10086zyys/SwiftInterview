@@ -133,10 +133,10 @@ fun QuestionPage(onExitInterview: () -> Unit) {
                             if (!interviewStarted) {
                                 isPlaying = true
                                 InterviewStarter.startInterview(
-                                    serverUrl = "http://192.168.0.100:5000/start_interview"
+                                    serverUrl = "http://192.168.0.103:5000/start_interview"
                                 ) { success, _, audioUrl ->
                                     if (success && audioUrl != null) {
-                                        val fullUrl = "http://192.168.0.100:5000$audioUrl"
+                                        val fullUrl = "http://192.168.0.103:5000$audioUrl"
                                         mediaPlayer?.release()
                                         mediaPlayer = MediaPlayer().apply {
                                             setDataSource(fullUrl)
@@ -166,10 +166,10 @@ fun QuestionPage(onExitInterview: () -> Unit) {
                                 file?.let {
                                     AudioUploader.uploadAudio(
                                         it,
-                                        serverUrl = "http://192.168.0.100:5000/upload_audio_final"
+                                        serverUrl = "http://192.168.0.103:5000/upload_audio_final"
                                     ) { success, newAudioUrl ->
                                         if (success && newAudioUrl != null) {
-                                            val fullUrl = "http://192.168.0.100:5000$newAudioUrl"
+                                            val fullUrl = "http://192.168.0.103:5000$newAudioUrl"
                                             try {
                                                 mediaPlayer?.release()
                                                 mediaPlayer = MediaPlayer().apply {

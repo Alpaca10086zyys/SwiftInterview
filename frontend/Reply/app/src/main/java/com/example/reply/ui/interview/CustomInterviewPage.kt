@@ -233,7 +233,7 @@ fun CustomInterviewPage(onStartInterview: (String) -> Unit = {}) {
                             focus = selectedFocus,
                             thinkingJump = thinkingJumpLevel.toInt(),
                             depth = questionDepth.toInt(),
-                            serverUrl = "http://192.168.0.100:5000/modify-text_new" //"http://100.84.252.55:5000/modify-text"
+                            serverUrl = "http://192.168.0.103:5000/api/interview/modify-text_new"
                         ) { success, response ->
                             Log.d("Upload", "Success=$success, Response=$response")
                             if (success) {
