@@ -2,18 +2,21 @@ from flask import Blueprint, request, jsonify, send_from_directory
 import os
 from werkzeug.utils import secure_filename
 from services.knowledge_service import save_file_metadata, delete_file_metadata, get_all_files
-from utils.embedding.text_embedder import embed_txt_file,get_embedding
+from utils.embedding.text_embedder import embed_txt_file, get_embedding
 from utils.supabase_client import get_supabase
 import time
 
 knowledge_bp = Blueprint('knowledge', __name__, url_prefix="/api/knowledge")
 UPLOAD_FOLDER = "uploads"
-ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt', 'png', 'jpg', 'jpeg','json'}
+ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt', 'png', 'jpg', 'jpeg', 'json'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def allowed_file(filename,allowed_extensions=ALLOWED_EXTENSIONS):
+    # print(ALLOWED_EXTENSIONS)
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
 
 @knowledge_bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -71,6 +74,7 @@ def upload_file():
         "filename": final_filename,
         "user_id": user_id
     })
+
 
 @knowledge_bp.route('/delete', methods=['POST'])
 def delete_file():
@@ -163,6 +167,7 @@ def list_files():
 
     # 3) 直接把查询结果作为 JSON 发回前端
     return jsonify(data), 200
+
 
 @knowledge_bp.route('/download', methods=['GET'])
 def download_file():
