@@ -3,20 +3,50 @@ package com.example.reply.ui.homepage
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.reply.data.UserData
+import com.example.reply.network.ApiService
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Composable
 fun GroupsMainPage(
     onLoginClicked: () -> Unit,
     userData: UserData? = null,
-    onLogout: () -> Unit = {}
+    onLogout: () -> Unit = {},
+    onJobStatusUpdated: (String) -> Unit = {}  // 可传给 ViewModel 做持久化
 ) {
+    // 求职状态
+    val jobStatusInitial = userData?.jobStatus ?: "离校-随时到岗"
+    var jobStatus by remember { mutableStateOf(jobStatusInitial) }
+
+    // 使用天数
+    val daysUsed = remember(userData) {
+        userData?.createdAt?.let { createdAt ->
+            calculateDaysUsed(createdAt)
+        } ?: 0
+    }
+
+    // 处理求职状态更新
+    val updateJobStatus: (String) -> Unit = { newStatus ->
+        jobStatus = newStatus
+        userData?.id?.let { userId ->
+            ApiService.updateJobStatus(userId, newStatus) { success, message ->
+                if (!success) {
+                    // 失败时恢复原状态
+                    jobStatus = jobStatusInitial
+                    // 显示错误消息（实际应用中可用 Snackbar）
+                    println("求职状态更新失败: $message")
+                }
+            }
+        }
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -36,8 +66,12 @@ fun GroupsMainPage(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 数据统计区域
-            StatsSection()
+            // 数据统计区域（使用天数 & 求职状态）
+            StatsSection(
+                daysUsed = daysUsed,
+                jobStatus = jobStatus,
+                onJobStatusChange = updateJobStatus
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -66,5 +100,16 @@ fun GroupsMainPage(
                 }
             }
         }
+    }
+}
+
+private fun calculateDaysUsed(createdAt: String): Int {
+    return try {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val createdDate = LocalDateTime.parse(createdAt, formatter)
+        val now = LocalDateTime.now()
+        ChronoUnit.DAYS.between(createdDate, now).toInt()
+    } catch (e: Exception) {
+        0
     }
 }

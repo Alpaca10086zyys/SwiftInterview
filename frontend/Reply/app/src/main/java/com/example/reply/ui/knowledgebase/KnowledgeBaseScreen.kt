@@ -39,13 +39,13 @@ fun KnowledgeBaseScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // 搜索框和按钮行 - 按钮在搜索框外部
+            // 搜索框和按钮行
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // 搜索框 - 带边框
+                // 搜索框
                 OutlinedTextField(
                     value = searchText,
                     onValueChange = { searchText = it },
@@ -53,14 +53,14 @@ fun KnowledgeBaseScreen(navController: NavController) {
                         .weight(1f)
                         .height(56.dp)
                         .focusRequester(focusRequester),
-                    textStyle = TextStyle(fontSize = 14.sp), // 调整字体大小
+                    textStyle = TextStyle(fontSize = 14.sp),
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "搜索"
                         )
                     },
-                    placeholder = { Text("搜索", fontSize = 14.sp) }, // 调整字体大小
+                    placeholder = { Text("搜索", fontSize = 14.sp) },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     colors = TextFieldDefaults.colors(
@@ -70,7 +70,7 @@ fun KnowledgeBaseScreen(navController: NavController) {
                     )
                 )
 
-                // "去搜索"按钮 - 在搜索框外部
+                // "去搜索"按钮
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = {
@@ -136,7 +136,7 @@ fun KnowledgeBaseScreen(navController: NavController) {
     }
 }
 
-// 修改：添加 modifier 参数
+
 @Composable
 fun TabButton(
     text: String,

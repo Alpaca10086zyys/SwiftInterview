@@ -10,7 +10,7 @@ import org.json.JSONObject
 import java.io.IOException
 
 object ApiService {
-    private const val BASE_URL = "http://192.168.255.26:5000/api/user"
+    private const val BASE_URL = "http://192.168.255.34:5000/api/user"
     private val client = OkHttpClient()
     private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -54,12 +54,17 @@ object ApiService {
                                 .takeIf { it.isNotEmpty() }
                             ?: jsonResponse.optString("name", "用户")
 
+                        // 新增字段
+                        val createdAt = jsonResponse.optString("created_at", "")
+                        val jobStatus = jsonResponse.optString("job_status", "离校-随时到岗")
 
                         if (userId.isNotEmpty()) {
                             val user = UserData(
                                 id = userId,
                                 email = email,
-                                nickname = nickname
+                                nickname = nickname,
+                                createdAt = createdAt,
+                                jobStatus = jobStatus
                             )
                             mainHandler.post {
                                 callback(true, user, "登录成功")
@@ -130,6 +135,54 @@ object ApiService {
                     }
                 } catch (e: Exception) {
                     println("注册解析错误: ${e.message}")
+                    mainHandler.post {
+                        callback(false, "解析错误: ${e.message}")
+                    }
+                }
+            }
+        })
+    }
+
+    fun updateJobStatus(
+        userId: String,
+        newStatus: String,
+        callback: (success: Boolean, message: String) -> Unit
+    ) {
+        val json = JSONObject().apply {
+            put("job_status", newStatus)
+        }
+
+        val request = Request.Builder()
+            .url("$BASE_URL/update_job_status/$userId")
+            .patch(RequestBody.create(JSON_MEDIA_TYPE, json.toString()))
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                println("更新求职状态网络错误: ${e.message}")
+                mainHandler.post {
+                    callback(false, "网络错误: ${e.message}")
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string() ?: ""
+                println("更新求职状态响应: ${response.code} - $responseBody")
+
+                try {
+                    if (response.isSuccessful) {
+                        mainHandler.post {
+                            callback(true, "求职状态更新成功")
+                        }
+                    } else {
+                        val jsonResponse = JSONObject(responseBody)
+                        val errorMsg = jsonResponse.optString("error", "更新失败: ${response.code}")
+                        mainHandler.post {
+                            callback(false, errorMsg)
+                        }
+                    }
+                } catch (e: Exception) {
+                    println("更新求职状态解析错误: ${e.message}")
                     mainHandler.post {
                         callback(false, "解析错误: ${e.message}")
                     }
