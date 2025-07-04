@@ -7,15 +7,17 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
 import com.example.reply.data.UserData
@@ -25,6 +27,7 @@ import com.example.reply.ui.homepage.LoginScreen
 import com.example.reply.ui.homepage.RegisterScreen
 import com.example.reply.ui.interview.InterviewScreen
 import com.example.reply.ui.knowledgebase.KnowledgeBaseScreen
+import com.example.reply.ui.knowledgebase.SearchResultScreen
 import com.example.reply.ui.knowledgebase.UploadScreen
 import com.example.reply.ui.navigation.ReplyNavigationActions
 import com.example.reply.ui.navigation.ReplyNavigationWrapper
@@ -158,6 +161,20 @@ private fun ReplyNavHost(
                     }
                 }
             )
+        }
+
+        // 修复：使用正确的路由定义方式
+        composable(
+            route = "searchResult/{query}",
+            arguments = listOf(
+                navArgument("query") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val query = backStackEntry.arguments?.getString("query") ?: ""
+            SearchResultScreen(navController, query)
         }
     }
 }

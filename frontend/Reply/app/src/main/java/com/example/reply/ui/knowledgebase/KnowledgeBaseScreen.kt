@@ -14,9 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.reply.ui.navigation.ReplyNavigationActions
@@ -36,33 +39,58 @@ fun KnowledgeBaseScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // 搜索框
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = { searchText = it },
+            // 搜索框和按钮行 - 按钮在搜索框外部
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .focusRequester(focusRequester),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "搜索"
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 搜索框 - 带边框
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp)
+                        .focusRequester(focusRequester),
+                    textStyle = TextStyle(fontSize = 14.sp), // 调整字体大小
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "搜索"
+                        )
+                    },
+                    placeholder = { Text("搜索", fontSize = 14.sp) }, // 调整字体大小
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface,
                     )
-                },
-                placeholder = { Text("搜索") },
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface,
                 )
-            )
+
+                // "去搜索"按钮 - 在搜索框外部
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        navController.navigate("searchResult/${searchText.text}")
+                    },
+                    modifier = Modifier
+                        .height(56.dp),
+                    shape = RoundedCornerShape(12.dp), // 圆角
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF0D47A1), // 深蓝色
+                        contentColor = Color.White // 白色文字
+                    )
+                ) {
+                    Text("去搜索")
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 修复：将 weight 移到 RowScope 中
+            // 标签选择区域
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -71,12 +99,11 @@ fun KnowledgeBaseScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 KnowledgeBaseTab.values().forEach { tab ->
-                    // 将 weight 应用到这里的 Modifier 上
                     TabButton(
                         text = tab.title,
                         isSelected = selectedTab == tab,
                         onClick = { selectedTab = tab },
-                        modifier = Modifier.weight(1f) // 将 weight 移到这里
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
@@ -93,7 +120,6 @@ fun KnowledgeBaseScreen(navController: NavController) {
         // 悬浮按钮
         FloatingActionButton(
             onClick = {
-                // 使用导航动作导航到上传页面
                 ReplyNavigationActions(navController as NavHostController).navigateToUpload()
             },
             modifier = Modifier
