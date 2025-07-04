@@ -57,7 +57,7 @@ def ask_model(question_text, session_id, system_prompt, conversation_history="")
 
 # 示例：调用ask_model提问
 def answer_question(question):
-    prompt = f"针对{question}这个问题，给出答案"
+    prompt =  f"针对问题：{question}，给出答案。要求答案精简凝练为一段话，格式为纯文本，请直接输出答案："
     session_id = str(uuid.uuid4())  # 初始化会话ID
     system_prompt = "你是面试官，负责问问题。"  # 模型的角色定位
     question_text = prompt  # 问题内容
@@ -68,5 +68,5 @@ def answer_question(question):
 
 
 
-if __name__ == "__main__":
-    ask_one_question()
+# if __name__ == "__main__":
+#     ask_one_question()
