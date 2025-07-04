@@ -62,3 +62,21 @@ def login_user(email, password):
         "job_status": user["job_status"],
         "message": "Login successful"
     }
+
+
+def update_job_status(user_id, new_status):
+    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users?id=eq.{user_id}"
+    headers = {
+        "apikey": current_app.config["SUPABASE_KEY"],
+        "Authorization": f"Bearer {current_app.config['SUPABASE_KEY']}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    }
+    data = {"job_status": new_status}
+    res = requests.patch(url, headers=headers, json=data)
+    try:
+        json_data = res.json()
+    except Exception:
+        json_data = None
+    return res.status_code, json_data
+
