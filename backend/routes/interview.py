@@ -5,7 +5,7 @@ from routes.interview_audio.asr import ai_speech
 from routes.interview_audio.prompt import get_depth_description, get_jumpiness_description
 import os
 from datetime import datetime
-from review import fire_and_forget
+from routes.review import fire_and_forget
 
 interview_bp = Blueprint('interview', __name__, url_prefix='/api/interview')
 
@@ -219,7 +219,14 @@ def end_interview():
 
     raw_text = get_text_content(log_file_path)
     fire_and_forget(user_id, title, log_file_path, duration_dict, raw_text, tags)
-
+    # 返回结束时的响应
+    return jsonify({
+        'message': 'Interview ended successfully',
+        'duration': duration_dict,
+        'raw_text': raw_text,
+        'title': title,
+        'tags': tags
+    })
 
 
 # 静态资源访问示例

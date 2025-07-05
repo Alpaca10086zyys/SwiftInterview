@@ -13,8 +13,8 @@ def create_app():
     app.config.from_object(Config)
 
     CORS(app)
-    app.register_blueprint(knowledge_bp)
-    app.register_blueprint(user_bp)
+    #app.register_blueprint(knowledge_bp)
+    #app.register_blueprint(user_bp)
     app.register_blueprint(interview_bp)
     app.register_blueprint(interview_text_bp)
     app.register_blueprint(review_bp)
