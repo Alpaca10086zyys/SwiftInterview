@@ -130,12 +130,13 @@ fun UploadScreen(navController: NavController, userId: String) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // 更新支持的文件类型提示
             Text(
                 text = selectedFile?.let {
                     val sizeKB = it.length() / 1024
                     val sizeMB = sizeKB / 1024.0
                     if (sizeMB > 1) "%.2f MB".format(sizeMB) else "$sizeKB KB"
-                } ?: "支持文档、图片、视频等多种格式",
+                } ?: "支持文件类型: txt, pdf, doc, docx, pptx",
                 color = Color.Gray,
                 textAlign = TextAlign.Center
             )
@@ -236,7 +237,7 @@ private suspend fun uploadFile(file: File, userId: String): Response<UploadRespo
             val userIdBody = userId.toRequestBody("text/plain".toMediaTypeOrNull())
 
             val retrofit = Retrofit.Builder()
-                .baseUrl("http://192.168.255.10:5000/")
+                .baseUrl("http://192.168.255.38:5000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 

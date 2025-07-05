@@ -32,14 +32,15 @@ data class DeleteResponse(
     val user_id: String
 )
 
-// 文档类型枚举
+// 文档类型枚举 - 只保留需要的文件类型
 enum class DocumentType(
     val displayName: String
 ) {
     PDF("PDF文档"),
     TXT("文本文件"),
-    JPG("图片文件"),
-    MP4("视频文件")
+    DOC("Word文档"),
+    DOCX("Word文档"),
+    PPTX("PPT文档")
 }
 
 // 文档数据模型

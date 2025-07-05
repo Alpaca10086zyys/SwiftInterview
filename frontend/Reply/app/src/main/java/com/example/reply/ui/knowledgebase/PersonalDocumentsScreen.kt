@@ -7,10 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.PictureAsPdf
-import androidx.compose.material.icons.filled.VideoFile
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -178,7 +175,7 @@ private fun parseIsoDate(dateString: String): Date {
 private suspend fun fetchDocuments(userId: String): List<FileResponse> {
     return withContext(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.255.10:5000/")
+            .baseUrl("http://192.168.255.38:5000/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -195,7 +192,7 @@ private suspend fun fetchDocuments(userId: String): List<FileResponse> {
 private suspend fun deleteDocument(fileId: Long, userId: String) {
     withContext(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.255.10:5000/")
+            .baseUrl("http://192.168.255.38:5000/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -207,13 +204,15 @@ private suspend fun deleteDocument(fileId: Long, userId: String) {
     }
 }
 
+// 更新文件类型识别逻辑 - 只处理指定的文件类型
 private fun getDocumentTypeFromFilename(filename: String): DocumentType {
     return when (val ext = filename.substringAfterLast('.').lowercase()) {
         "pdf" -> DocumentType.PDF
-        "txt", "md" -> DocumentType.TXT
-        "jpg", "jpeg", "png", "gif" -> DocumentType.JPG
-        "mp4", "mov", "avi" -> DocumentType.MP4
-        else -> DocumentType.TXT
+        "txt" -> DocumentType.TXT
+        "doc" -> DocumentType.DOC
+        "docx" -> DocumentType.DOCX
+        "pptx" -> DocumentType.PPTX
+        else -> DocumentType.TXT // 其他类型视为文本文件
     }
 }
 
@@ -299,24 +298,24 @@ fun DocumentItem(
     }
 }
 
-// 根据文档类型获取颜色
+// 根据文档类型获取颜色 - 每种类型不同颜色
 private fun getColorForType(type: DocumentType): Color {
     return when (type) {
-        DocumentType.PDF -> Color(0xFFF44336) // 红色
-        DocumentType.TXT -> Color(0xFF2196F3) // 蓝色
-        DocumentType.JPG -> Color(0xFF4CAF50) // 绿色
-        DocumentType.MP4 -> Color(0xFFFF9800) // 橙色
-        else -> Color(0xFF9E9E9E) // 灰色
+        DocumentType.PDF -> Color(0xFFF44336) // 红
+        DocumentType.TXT -> Color(0xFF2196F3) // 蓝
+        DocumentType.DOC -> Color(0xFF3F51B5) // 深蓝
+        DocumentType.DOCX -> Color(0xFF3F51B5) // 深蓝
+        DocumentType.PPTX -> Color(0xFFFF5722) // 橙
     }
 }
 
-// 根据文档类型获取图标
+// 根据文档类型获取图标 - 每种类型不同图标
 private fun getIconForType(type: DocumentType): ImageVector {
     return when (type) {
         DocumentType.PDF -> Icons.Default.PictureAsPdf
         DocumentType.TXT -> Icons.Default.Description
-        DocumentType.JPG -> Icons.Default.PictureAsPdf // 使用相同的图标
-        DocumentType.MP4 -> Icons.Default.VideoFile
-        else -> Icons.Default.Description
+        DocumentType.DOC -> Icons.Default.Description // 使用文档图标
+        DocumentType.DOCX -> Icons.Default.Description // 使用文档图标
+        DocumentType.PPTX -> Icons.Default.Slideshow // 使用幻灯片图标
     }
 }
