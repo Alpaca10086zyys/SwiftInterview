@@ -218,7 +218,6 @@ def end_interview():
     duration_dict = {"h": hours, "m": minutes, "s": seconds}
 
     raw_text = get_text_content(log_file_path)
-    print("Ending interview with the following parameters:")
     print(f"user_id: {user_id}")
     print(f"title: {title}")
     print(f"log_file_path: {log_file_path}")
