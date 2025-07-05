@@ -28,7 +28,7 @@ def delete_user(user_id):
 
 
 def login_user(email, password):
-    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users?email=eq.{email}&select=id,password"
+    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users?email=eq.{email}&select=*"
     headers = {
         "apikey": current_app.config["SUPABASE_KEY"],
         "Authorization": f"Bearer {current_app.config['SUPABASE_KEY']}",
@@ -54,4 +54,29 @@ def login_user(email, password):
     if user["password"] != password:
         return 401, {"message": "Incorrect password"}
 
-    return 200, {"id": user["id"], "message": "Login successful"}
+    return 200, {
+        "id": user["id"],
+        "created_at": user["created_at"],
+        "email": user["email"],
+        "user_name": user["user_name"],
+        "job_status": user["job_status"],
+        "message": "Login successful"
+    }
+
+
+def update_job_status(user_id, new_status):
+    url = f"{current_app.config['SUPABASE_URL']}/rest/v1/users?id=eq.{user_id}"
+    headers = {
+        "apikey": current_app.config["SUPABASE_KEY"],
+        "Authorization": f"Bearer {current_app.config['SUPABASE_KEY']}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    }
+    data = {"job_status": new_status}
+    res = requests.patch(url, headers=headers, json=data)
+    try:
+        json_data = res.json()
+    except Exception:
+        json_data = None
+    return res.status_code, json_data
+

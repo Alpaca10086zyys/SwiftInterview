@@ -142,7 +142,7 @@ def control_process(wav_path):
     co2 = gevent.spawn(recv_process, ws, t, wav_path, result_list)
     gevent.joinall([co1, co2])
     time.sleep(0.04)
-
+    print(f"result_list:{result_list}")
     return result_list  # 返回最终结果
 
 def recognize_wav(wav_path):
@@ -150,3 +150,6 @@ def recognize_wav(wav_path):
     识别指定的 WAV 文件并返回结果列表
     """
     return control_process(wav_path)
+
+# if __name__=="__main__":
+#     print(recognize_wav(r""))

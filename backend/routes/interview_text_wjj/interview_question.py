@@ -57,7 +57,7 @@ def ask_model(question_text, session_id, system_prompt, conversation_history="")
 
 # 示例：调用ask_model提问
 def ask_one_question():
-    prompt = "你是一名专业的技术面试官。请从以下三个方向中任选一个：前端、后端、算法，提出一道高质量的面试问题，题目关注知识性的，不需要提供答案"
+    prompt = "你是一名专业的技术面试官。请从前端、后端、算法三个方向中任选一个，提出一道简短且高质量的面试题，请直接输出问题："
     session_id = str(uuid.uuid4())  # 初始化会话ID
     system_prompt = "你是面试官，负责问问题。"  # 模型的角色定位
     question_text = prompt  # 问题内容
