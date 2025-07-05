@@ -75,7 +75,7 @@ fun InterviewChatPage() {
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
             try {
-                val url = URL("http://192.168.0.103:5000/start_text_interview")
+                val url = URL("http://192.168.0.106:5000/api/interview/start_text_interview")
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "POST"
                 connection.doOutput = true
@@ -138,7 +138,7 @@ fun InterviewChatPage() {
 
                                 coroutineScope.launch(Dispatchers.IO) {
                                     try {
-                                        val url = URL("http://192.168.0.103:5000/last_text_question")
+                                        val url = URL("http://192.168.0.106:5000/api/interview/last_text_question")
                                         val connection = url.openConnection() as HttpURLConnection
                                         connection.requestMethod = "POST"
                                         connection.doOutput = true

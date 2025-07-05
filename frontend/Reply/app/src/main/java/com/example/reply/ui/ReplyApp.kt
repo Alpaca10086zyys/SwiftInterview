@@ -7,8 +7,8 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -26,6 +26,8 @@ import com.example.reply.ui.homepage.GroupsScreen
 import com.example.reply.ui.homepage.LoginScreen
 import com.example.reply.ui.homepage.RegisterScreen
 import com.example.reply.ui.interview.InterviewScreen
+import com.example.reply.ui.intervieweview.ReviewDetailScreen
+import com.example.reply.ui.intervieweview.ReviewScreen
 import com.example.reply.ui.knowledgebase.KnowledgeBaseScreen
 import com.example.reply.ui.knowledgebase.SearchResultScreen
 import com.example.reply.ui.knowledgebase.UploadScreen
@@ -102,7 +104,7 @@ fun ReplyApp(
                 navigateToDetail = navigateToDetail,
                 toggleSelectedEmail = toggleSelectedEmail,
                 groupsUserData = groupsUserData,
-                onGroupsUserDataChange = { user -> groupsUserData = user }
+                onGroupsUserDataChange = { user -> groupsUserData = user } // 修复类型推断问题
             )
         }
     }
@@ -127,8 +129,8 @@ private fun ReplyNavHost(
         navController = navController,
         startDestination = Route.Inbox,
     ) {
-        composable<Route.Inbox> { InterviewScreen() }
-        composable<Route.DirectMessages> { EmptyComingSoon() }
+        composable<Route.Inbox> { InterviewScreen(userId = groupsUserData?.id ?: "") }
+        composable<Route.DirectMessages> {ReviewScreen(navController = navController, userId = groupsUserData?.id ?: "6")}
         composable<Route.Book> {
             KnowledgeBaseScreen(navController, groupsUserData?.id ?: "")
         }
@@ -189,5 +191,22 @@ private fun ReplyNavHost(
             val query = backStackEntry.arguments?.getString("query") ?: ""
             SearchResultScreen(navController, userId, query)
         }
+
+        composable(
+            route = "reviewDetail/{title}/{content}",
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType },
+                navArgument("content") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val title = backStackEntry.arguments?.getString("title") ?: "无标题"
+            val content = backStackEntry.arguments?.getString("content") ?: "无内容"
+            ReviewDetailScreen(
+                title = title,
+                content = content,
+                navController = navController
+            )
+        }
+
     }
 }

@@ -4,6 +4,7 @@ package com.example.reply.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Article
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.People
@@ -22,9 +23,11 @@ sealed interface Route {
     @Serializable data object Groups : Route
     @Serializable data object Login : Route
     @Serializable data object Register : Route
-
     // 添加上传路由对象
     @Serializable data object Upload : Route
+    @Serializable data object ReviewDetail : Route
+
+
 }
 
 data class ReplyTopLevelDestination(val route: Route, val selectedIcon: ImageVector, val unselectedIcon: ImageVector, val iconTextId: Int)

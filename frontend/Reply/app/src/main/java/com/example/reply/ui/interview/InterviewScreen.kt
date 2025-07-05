@@ -12,7 +12,7 @@ enum class InterviewPage {
 }
 
 @Composable
-fun InterviewScreen() {
+fun InterviewScreen(userId: String) {
     var currentPage by remember { mutableStateOf(InterviewPage.Entry) }
 
     when (currentPage) {
@@ -21,6 +21,7 @@ fun InterviewScreen() {
         })
 
         InterviewPage.CustomInterview -> CustomInterviewPage(
+            userId = userId,
             onStartInterview = { mode ->
                 currentPage = if (mode == "文字面试") {
                     InterviewPage.ChatInterview

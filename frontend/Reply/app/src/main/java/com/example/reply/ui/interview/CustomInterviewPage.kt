@@ -19,7 +19,7 @@ import com.example.reply.ui.network.InterviewConfigUploader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomInterviewPage(onStartInterview: (String) -> Unit = {}) {
+fun CustomInterviewPage(userId :String,onStartInterview: (String) -> Unit = {}) {
     var job by remember { mutableStateOf<String?>(null) }
     var style by remember { mutableStateOf<String?>(null) }
     val focusOptions = listOf("项目经历", "基础知识", "行业理解", "应变能力", "沟通表达", "逻辑思维")
@@ -228,12 +228,13 @@ fun CustomInterviewPage(onStartInterview: (String) -> Unit = {}) {
                     // 请注意：这里是相关配置上传逻辑
                     if (isFormComplete) {
                         InterviewConfigUploader.uploadConfig(
+                            user_id = userId,
                             job = job ?: "",
                             style = style ?: "",
                             focus = selectedFocus,
                             thinkingJump = thinkingJumpLevel.toInt(),
                             depth = questionDepth.toInt(),
-                            serverUrl = "http://192.168.0.103:5000/api/interview/modify-text_new"
+                            serverUrl = "http://192.168.0.106:5000/api/interview/modify-text_new"
                         ) { success, response ->
                             Log.d("Upload", "Success=$success, Response=$response")
                             if (success) {
