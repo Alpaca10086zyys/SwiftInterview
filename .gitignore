@@ -1,0 +1,60 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# Flask / Django specific
+instance/
+.webassets-cache
+*.log
+*.sqlite3
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS / Linux / Windows system files
+.DS_Store
+Thumbs.db
+
+# Testing
+htmlcov/
+.tox/
+.nox/
+.coverage
+coverage.xml
+.pytest_cache/
+nosetests.xml
+test-results/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# mypy / pylint / other tooling
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# Build / Distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+logs/
+*.log
+
+# Supabase / local secrets
+.supabase/
+.env
+.env.*
