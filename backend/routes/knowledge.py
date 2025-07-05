@@ -2,13 +2,13 @@ from flask import Blueprint, request, jsonify, send_from_directory
 import os
 from werkzeug.utils import secure_filename
 from services.knowledge_service import save_file_metadata, delete_file_metadata, get_all_files
-from utils.embedding.text_embedder import embed_txt_file, get_embedding
+from utils.embedding.text_embedder import embed_file, get_embedding
 from utils.supabase_client import get_supabase
 import time
 
 knowledge_bp = Blueprint('knowledge', __name__, url_prefix="/api/knowledge")
 UPLOAD_FOLDER = "uploads"
-ALLOWED_EXTENSIONS = {'pdf', 'docx', 'txt', 'png', 'jpg', 'jpeg', 'json'}
+ALLOWED_EXTENSIONS = {'txt', 'pdf','doc' ,'docx', 'pptx'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -62,11 +62,11 @@ def upload_file():
     except Exception as e:
         return jsonify({"error": f"插入文件记录失败：{str(e)}"})
     # 🌟 添加这句：向量化
-    if ext.lower() == ".txt":
-        try:
-            embed_txt_file(file_path=file_path, file_id=file_id)  # ✅ 新版函数只需 file_path + file_id
-        except Exception as e:
-            return jsonify({"error": f"向量化失败：{str(e)}"}), 500
+    # if ext.lower() == ".txt":
+    try:
+        embed_file(file_path=file_path, file_id=file_id)  # ✅ 新版函数只需 file_path + file_id
+    except Exception as e:
+        return jsonify({"error": f"向量化失败：{str(e)}"}), 500
 
     return jsonify({
         "message": "上传成功",
