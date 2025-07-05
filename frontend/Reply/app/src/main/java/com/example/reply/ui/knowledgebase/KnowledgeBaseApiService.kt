@@ -18,9 +18,15 @@ interface KnowledgeBaseApiService {
         @Part("user_id") userId: RequestBody
     ): Response<UploadResponse>
 
-    // 删除文件 - 修复版本
+    // 删除文件
     @POST("api/knowledge/delete")
     suspend fun deleteFile(
         @Body body: DeleteRequest
     ): Response<DeleteResponse>
+
+    // 搜索文件 - 修改返回类型
+    @POST("api/knowledge/search")
+    suspend fun searchFiles(
+        @Body body: SearchRequest
+    ): Response<SearchResponse>
 }

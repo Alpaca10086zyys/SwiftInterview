@@ -237,7 +237,7 @@ private suspend fun uploadFile(file: File, userId: String): Response<UploadRespo
             val userIdBody = userId.toRequestBody("text/plain".toMediaTypeOrNull())
 
             val retrofit = Retrofit.Builder()
-                .baseUrl("http://192.168.255.38:5000/")
+                .baseUrl("http://192.168.255.26:5000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 

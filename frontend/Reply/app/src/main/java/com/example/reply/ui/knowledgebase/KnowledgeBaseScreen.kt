@@ -12,10 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -28,8 +25,6 @@ import com.example.reply.ui.navigation.ReplyNavigationActions
 fun KnowledgeBaseScreen(navController: NavController, userId: String) {
     var selectedTab by remember { mutableStateOf(KnowledgeBaseTab.PERSONAL_DOCS) }
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
-    val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -51,8 +46,7 @@ fun KnowledgeBaseScreen(navController: NavController, userId: String) {
                     onValueChange = { searchText = it },
                     modifier = Modifier
                         .weight(1f)
-                        .height(56.dp)
-                        .focusRequester(focusRequester),
+                        .height(56.dp),
                     textStyle = TextStyle(fontSize = 14.sp),
                     leadingIcon = {
                         Icon(
@@ -74,7 +68,8 @@ fun KnowledgeBaseScreen(navController: NavController, userId: String) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = {
-                        navController.navigate("searchResult/${searchText.text}")
+                        // 传递用户ID和查询内容
+                        navController.navigate("searchResult/${userId}/${searchText.text}")
                     },
                     modifier = Modifier
                         .height(56.dp),

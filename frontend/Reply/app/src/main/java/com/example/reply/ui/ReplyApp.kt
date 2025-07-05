@@ -179,16 +179,15 @@ private fun ReplyNavHost(
         }
 
         composable(
-            route = "searchResult/{query}",
+            route = "searchResult/{userId}/{query}",
             arguments = listOf(
-                navArgument("query") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                }
+                navArgument("userId") { type = NavType.StringType },
+                navArgument("query") { type = NavType.StringType }
             )
         ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
             val query = backStackEntry.arguments?.getString("query") ?: ""
-            SearchResultScreen(navController, query)
+            SearchResultScreen(navController, userId, query)
         }
     }
 }

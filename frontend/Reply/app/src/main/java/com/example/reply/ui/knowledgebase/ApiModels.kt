@@ -50,3 +50,26 @@ data class Document(
     val type: DocumentType,
     val date: Date
 )
+
+// 搜索结果模型
+data class SearchResultResponse(
+    val file_id: Long,
+    val filename: String,
+    val content: String,
+    val similarity: Float
+)
+
+// 搜索请求模型
+data class SearchRequest(
+    val query: String,
+    val user_id: String,
+    val threshold: Float = 0.7f,
+    val top_k: Int = 5
+)
+
+// 搜索响应模型
+data class SearchResponse(
+    val results: List<SearchResultResponse>,
+    val query: String,
+    val user_id: String
+)

@@ -1,5 +1,6 @@
 package com.example.reply.ui.knowledgebase
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,30 +20,66 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlin.random.Random
-
-// 搜索结果数据类
-data class SearchResult(
-    val id: Int,
-    val title: String,
-    val content: String,
-    val similarity: Float // 相似度 (0-1)
-)
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResultScreen(navController: NavController, query: String?) {
+fun SearchResultScreen(navController: NavController, userId: String, query: String?) {
     var searchText by remember { mutableStateOf(query ?: "") }
-    var searchResults by remember { mutableStateOf(generateSearchResults(searchText)) }
+    var searchResults by remember { mutableStateOf(emptyList<SearchResultResponse>()) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     // 执行搜索的函数
     fun performSearch() {
-        searchResults = generateSearchResults(searchText)
+        if (searchText.isEmpty()) return
+
+        isLoading = true
+        errorMessage = null
+
+        coroutineScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    val retrofit = Retrofit.Builder()
+                        .baseUrl("http://192.168.255.26:5000/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+
+                    val apiService = retrofit.create(KnowledgeBaseApiService::class.java)
+                    apiService.searchFiles(
+                        SearchRequest(
+                            query = searchText,
+                            user_id = userId
+                        )
+                    )
+                }
+
+                if (response.isSuccessful) {
+                    // 从响应中提取results数组
+                    searchResults = response.body()?.results ?: emptyList()
+                } else {
+                    val errorBody = response.errorBody()?.string() ?: "未知错误"
+                    throw Exception("搜索失败: ${response.code()} - $errorBody")
+                }
+            } catch (e: Exception) {
+                errorMessage = "搜索失败: ${e.message}"
+                Log.e("SearchResultScreen", "搜索错误", e)
+            } finally {
+                isLoading = false
+            }
+        }
     }
 
     // 初始化时执行一次搜索
     LaunchedEffect(Unit) {
-        performSearch()
+        if (!query.isNullOrEmpty()) {
+            performSearch()
+        }
     }
 
     Scaffold(
@@ -122,60 +159,58 @@ fun SearchResultScreen(navController: NavController, query: String?) {
             // 增加搜索框与卡片列表之间的间距 (24dp > 卡片间16dp)
             Spacer(modifier = Modifier.height(24.dp))
 
-            if (searchResults.isNotEmpty()) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(searchResults) { result ->
-                        SearchResultCard(result)
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
-            } else {
-                // 没有搜索结果时的提示
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "没有找到相关文档",
-                        color = Color.Gray,
-                        fontSize = 18.sp
-                    )
+                errorMessage != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = errorMessage ?: "搜索失败",
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 18.sp
+                        )
+                    }
+                }
+                searchResults.isNotEmpty() -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(searchResults) { result ->
+                            SearchResultCard(result)
+                        }
+                    }
+                }
+                else -> {
+                    // 没有搜索结果时的提示
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = if (searchText.isNotEmpty()) "没有找到相关文档" else "请输入搜索内容",
+                            color = Color.Gray,
+                            fontSize = 18.sp
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-// 生成搜索结果 (模拟) - 添加长文本测试
-fun generateSearchResults(query: String): List<SearchResult> {
-    if (query.isEmpty()) return emptyList()
-
-    val longText = "这是一个非常长的文档内容，用于测试卡片内部的滚动功能。" +
-            "当文本内容超过卡片固定高度时，用户应该能够在卡片内部滚动查看完整内容。" +
-            "这是为了确保用户体验良好，即使文档内容非常长也能方便阅读。" +
-            "长文本测试：".repeat(20) +
-            "文档结束。"
-
-    val mockDocuments = listOf(
-        "项目需求文档" to "这是关于项目需求的详细文档，包含功能描述和技术要求...",
-        "会议记录" to "本次会议讨论了项目进度和下一步计划，重点解决了技术难题...",
-        "设计草图" to "产品UI设计初稿，包含主要界面布局和交互流程...",
-        "技术方案" to "系统架构设计和技术选型方案，详细说明了各模块的实现方式...",
-        "用户反馈" to "收集到的用户反馈汇总，包含功能建议和问题报告...",
-        "长文档测试" to longText  // 添加长文本测试
-    )
-
-    return mockDocuments.mapIndexed { index, (title, content) ->
-        val similarity = 0.7f + Random.nextFloat() * 0.3f
-        SearchResult(index, title, content, similarity)
-    }
-}
-
-// 搜索结果卡片组件 - 减小高度并添加内部滚动
+// 搜索结果卡片组件
 @Composable
-fun SearchResultCard(result: SearchResult) {
+fun SearchResultCard(result: SearchResultResponse) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -197,7 +232,7 @@ fun SearchResultCard(result: SearchResult) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = result.title,
+                    text = result.filename,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     color = Color.Black
