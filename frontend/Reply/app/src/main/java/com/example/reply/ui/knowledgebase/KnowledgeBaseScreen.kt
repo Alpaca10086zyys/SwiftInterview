@@ -25,7 +25,7 @@ import androidx.navigation.NavHostController
 import com.example.reply.ui.navigation.ReplyNavigationActions
 
 @Composable
-fun KnowledgeBaseScreen(navController: NavController) {
+fun KnowledgeBaseScreen(navController: NavController, userId: String) {
     var selectedTab by remember { mutableStateOf(KnowledgeBaseTab.PERSONAL_DOCS) }
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     val focusRequester = remember { FocusRequester() }
@@ -112,7 +112,7 @@ fun KnowledgeBaseScreen(navController: NavController) {
 
             // 内容区域
             when (selectedTab) {
-                KnowledgeBaseTab.PERSONAL_DOCS -> PersonalDocumentsScreen()
+                KnowledgeBaseTab.PERSONAL_DOCS -> PersonalDocumentsScreen(userId = userId)
                 KnowledgeBaseTab.INTERVIEW_ARCHIVE -> InterviewArchiveScreen()
             }
         }
@@ -120,7 +120,7 @@ fun KnowledgeBaseScreen(navController: NavController) {
         // 悬浮按钮
         FloatingActionButton(
             onClick = {
-                ReplyNavigationActions(navController as NavHostController).navigateToUpload()
+                ReplyNavigationActions(navController as NavHostController).navigateToUpload(userId)
             },
             modifier = Modifier
                 .padding(16.dp)
@@ -135,7 +135,6 @@ fun KnowledgeBaseScreen(navController: NavController) {
         }
     }
 }
-
 
 @Composable
 fun TabButton(

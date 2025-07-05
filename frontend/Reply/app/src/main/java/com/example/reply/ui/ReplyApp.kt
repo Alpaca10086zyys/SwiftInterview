@@ -7,8 +7,8 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -102,7 +102,7 @@ fun ReplyApp(
                 navigateToDetail = navigateToDetail,
                 toggleSelectedEmail = toggleSelectedEmail,
                 groupsUserData = groupsUserData,
-                onGroupsUserDataChange = { user -> groupsUserData = user } // 修复类型推断问题
+                onGroupsUserDataChange = { user -> groupsUserData = user }
             )
         }
     }
@@ -129,7 +129,9 @@ private fun ReplyNavHost(
     ) {
         composable<Route.Inbox> { InterviewScreen() }
         composable<Route.DirectMessages> { EmptyComingSoon() }
-        composable<Route.Book> { KnowledgeBaseScreen(navController) }
+        composable<Route.Book> {
+            KnowledgeBaseScreen(navController, groupsUserData?.id ?: "")
+        }
         composable<Route.Articles> { DailyQuestionPage() }
         composable<Route.Groups> {
             GroupsScreen(
@@ -138,7 +140,6 @@ private fun ReplyNavHost(
                 onLogout = { onGroupsUserDataChange(null) }
             )
         }
-        composable<Route.Upload> { UploadScreen(navController) }
         composable<Route.Login> {
             LoginScreen(
                 onBackClicked = { navController.popBackStack() },
@@ -163,7 +164,20 @@ private fun ReplyNavHost(
             )
         }
 
-        // 修复：使用正确的路由定义方式
+        // 添加上传屏幕的路由定义（使用字符串路由）
+        composable(
+            route = "upload/{userId}",
+            arguments = listOf(
+                navArgument("userId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            UploadScreen(navController, userId)
+        }
+
         composable(
             route = "searchResult/{query}",
             arguments = listOf(
