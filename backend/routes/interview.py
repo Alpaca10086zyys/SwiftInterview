@@ -218,6 +218,13 @@ def end_interview():
     duration_dict = {"h": hours, "m": minutes, "s": seconds}
 
     raw_text = get_text_content(log_file_path)
+    print("Ending interview with the following parameters:")
+    print(f"user_id: {user_id}")
+    print(f"title: {title}")
+    print(f"log_file_path: {log_file_path}")
+    print(f"duration: {duration_dict}")
+    print(f"raw_text: {raw_text}")
+    print(f"tags: {tags}")
     fire_and_forget(user_id, title, log_file_path, duration_dict, raw_text, tags)
     # 返回结束时的响应
     return jsonify({
