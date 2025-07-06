@@ -19,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -39,6 +38,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
+import com.google.gson.JsonObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,11 +57,13 @@ fun ReviewScreen(navController: NavController,userId: String) {
                     isUploading = true
                     val success = uploadAudioFile(context, it, userId)
                     isUploading = false
+
                     if (success) {
+                        Toast.makeText(context, "上传成功", Toast.LENGTH_SHORT).show()
                         navController.navigate(Route.DirectMessages) {
                             popUpTo(Route.DirectMessages) { inclusive = true }
                         }
-                    } else {
+                    }else {
                         Toast.makeText(context, "上传失败", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
@@ -73,17 +75,7 @@ fun ReviewScreen(navController: NavController,userId: String) {
         }
     }
 
-    if (isUploading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
-                .clickable(enabled = false) {}, // 禁止交互
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    }
+
 
 
     LaunchedEffect(Unit) {
@@ -150,6 +142,19 @@ fun ReviewScreen(navController: NavController,userId: String) {
                     }
                 }
             }
+
+            if (isUploading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface)
+                        .clickable(enabled = false) {}, // 禁止交互
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
         }
     }
 }
@@ -270,8 +275,8 @@ suspend fun uploadAudioFile(context: Context, uri: Uri, userId: String): Boolean
 
             val client = OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(90, TimeUnit.SECONDS)
+                .writeTimeout(90, TimeUnit.SECONDS)
                 .build()
 
             val request = Request.Builder()
@@ -282,7 +287,16 @@ suspend fun uploadAudioFile(context: Context, uri: Uri, userId: String): Boolean
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) return@withContext false
                 val json = response.body?.string() ?: return@withContext false
-                return@withContext json.contains("\"status\":\"accepted\"")
+                Log.d("Upload", "服务器响应: $json")
+
+                try {
+                    val jsonObject = Gson().fromJson(json, JsonObject::class.java)
+                    val status = jsonObject["status"]?.asString
+                    return@withContext status == "accepted"
+                } catch (e: Exception) {
+                    Log.e("Upload", "JSON解析失败: ${e.message}")
+                    return@withContext false
+                }
             }
         } catch (e: Exception) {
             Log.e("Upload", "上传失败: ${e.message}")

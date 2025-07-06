@@ -130,7 +130,7 @@ private fun ReplyNavHost(
         startDestination = Route.Inbox,
     ) {
         composable<Route.Inbox> { InterviewScreen(userId = groupsUserData?.id ?: "") }
-        composable<Route.DirectMessages> {ReviewScreen(navController = navController, userId = groupsUserData?.id ?: "6")}
+        composable<Route.DirectMessages> {ReviewScreen(navController = navController, userId = groupsUserData?.id ?: "")}
         composable<Route.Book> {
             KnowledgeBaseScreen(navController, groupsUserData?.id ?: "")
         }
