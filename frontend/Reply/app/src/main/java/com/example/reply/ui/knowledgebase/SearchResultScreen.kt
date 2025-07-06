@@ -46,7 +46,7 @@ fun SearchResultScreen(navController: NavController, userId: String, query: Stri
             try {
                 val response = withContext(Dispatchers.IO) {
                     val retrofit = Retrofit.Builder()
-                        .baseUrl("http://192.168.255.26:5000/")
+                        .baseUrl("http://192.168.0.106:5000/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
 

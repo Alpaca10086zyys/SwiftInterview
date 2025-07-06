@@ -29,6 +29,13 @@ import com.example.reply.R
 import com.example.reply.network.InterviewStarter
 import com.example.reply.ui.audio.AudioUploader
 import com.example.reply.ui.audio.WavRecorder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
 @Composable
@@ -260,6 +267,7 @@ fun QuestionPage(onExitInterview: () -> Unit) {
                         )
                     }
 
+                    val coroutineScope = rememberCoroutineScope()
                     // 弹出对话框确认是否退出
                     if (showDialog) {
                         AlertDialog(
@@ -274,7 +282,17 @@ fun QuestionPage(onExitInterview: () -> Unit) {
                                 TextButton(
                                     onClick = {
                                         showDialog = false
-                                        onExitInterview()  // 返回首页
+                                        coroutineScope.launch {
+                                            try {
+                                                val success = endInterview()
+                                                Log.d("Interview", "endInterview 调用结果: $success")
+                                            } catch (e: Exception) {
+                                                Log.e("EndInterview", "失败: ${e.message}")
+                                            } finally {
+                                                onExitInterview()
+                                            }
+                                        }
+
                                     },
                                     colors = ButtonDefaults.textButtonColors(
                                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -298,5 +316,22 @@ fun QuestionPage(onExitInterview: () -> Unit) {
             }
         }
 
+    }
+}
+
+suspend fun endInterview(serverUrl: String = "http://192.168.0.106:5000/api/interview/end_interview"): Boolean {
+    return withContext(Dispatchers.IO) {
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url(serverUrl)
+            .post("".toRequestBody("application/json".toMediaType())) // 空请求体
+            .build()
+
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw Exception("结束面试失败: ${response.code}")
+            }
+            true
+        }
     }
 }

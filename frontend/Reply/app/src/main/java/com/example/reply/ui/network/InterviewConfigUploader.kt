@@ -7,7 +7,7 @@ import org.json.JSONObject
 
 object InterviewConfigUploader {
     fun uploadConfig(
-        user_id:String,
+        userid:String,
         job: String,
         style: String,
         focus: List<String>,
@@ -22,7 +22,7 @@ object InterviewConfigUploader {
             put("imp", focus.joinToString("、"))
             put("jumpiness_level",thinkingJump)
             put("depth",depth)
-            put(" user_id", user_id)
+            put("user_id", userid)
         }
 
         val client = OkHttpClient()

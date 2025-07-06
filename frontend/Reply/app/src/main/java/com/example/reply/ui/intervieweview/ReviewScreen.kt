@@ -1,7 +1,12 @@
 package com.example.reply.ui.intervieweview
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,22 +21,70 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
+import com.example.reply.ui.navigation.Route
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflect.TypeToken
 import com.google.gson.Gson
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewScreen(navController: NavController,userId: String = "6") {
+fun ReviewScreen(navController: NavController,userId: String) {
     var reviews by remember { mutableStateOf<List<InterviewReview>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isUploading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            coroutineScope.launch {
+                try {
+                    isUploading = true
+                    val success = uploadAudioFile(context, it, userId)
+                    isUploading = false
+                    if (success) {
+                        navController.navigate(Route.DirectMessages) {
+                            popUpTo(Route.DirectMessages) { inclusive = true }
+                        }
+                    } else {
+                        Toast.makeText(context, "上传失败", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    isUploading = false
+                    Toast.makeText(context, "上传出错: ${e.message}", Toast.LENGTH_LONG).show()
+                    Log.e("UploadCrash", "异常: ${e.stackTraceToString()}")
+                }
+            }
+        }
+    }
+
+    if (isUploading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))
+                .clickable(enabled = false) {}, // 禁止交互
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         try {
@@ -61,6 +114,17 @@ fun ReviewScreen(navController: NavController,userId: String = "6") {
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    launcher.launch("audio/*")
+                },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "上传")
+            }
         }
     ) { padding ->
         Box(modifier = Modifier
@@ -133,15 +197,6 @@ fun ReviewCard(review: InterviewReview,navController: NavController) {
                     tags.style?.let { TagChip("风格: $it") }
                 }
             }
-
-//            review.review_content?.let {
-//                Spacer(modifier = Modifier.height(12.dp))
-//                Text(
-//                    text = it,
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    color = MaterialTheme.colorScheme.onPrimaryContainer
-//                )
-//            }
         }
     }
 }
@@ -198,3 +253,42 @@ suspend fun fetchReviewData(userId: String): List<InterviewReview> {
         }
     }
 }
+
+suspend fun uploadAudioFile(context: Context, uri: Uri, userId: String): Boolean {
+    return withContext(Dispatchers.IO) {
+        try {
+            val contentResolver = context.contentResolver
+            val fileName = uri.path?.split("/")?.lastOrNull() ?: "recording.wav"
+
+            val buffer = contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                ?: return@withContext false
+
+            val fileRequest = MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("file", fileName, buffer.toRequestBody("audio/*".toMediaTypeOrNull()))
+                .addFormDataPart("user_id", userId)
+                .build()
+
+            val client = OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build()
+
+            val request = Request.Builder()
+                .url("http://192.168.0.106:5000/api/review/upload_audio")
+                .post(fileRequest)
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) return@withContext false
+                val json = response.body?.string() ?: return@withContext false
+                return@withContext json.contains("\"status\":\"accepted\"")
+            }
+        } catch (e: Exception) {
+            Log.e("Upload", "上传失败: ${e.message}")
+            return@withContext false
+        }
+    }
+}
+
+

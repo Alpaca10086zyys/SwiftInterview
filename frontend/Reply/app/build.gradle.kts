@@ -143,6 +143,10 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.github.jeziellago:compose-markdown:0.3.1")
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+
 
 
     // Retrofit

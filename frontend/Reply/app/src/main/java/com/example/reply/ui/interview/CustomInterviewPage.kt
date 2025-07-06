@@ -228,7 +228,7 @@ fun CustomInterviewPage(userId :String,onStartInterview: (String) -> Unit = {}) 
                     // 请注意：这里是相关配置上传逻辑
                     if (isFormComplete) {
                         InterviewConfigUploader.uploadConfig(
-                            user_id = userId,
+                            userid = userId,
                             job = job ?: "",
                             style = style ?: "",
                             focus = selectedFocus,

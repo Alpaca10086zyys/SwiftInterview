@@ -14,10 +14,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
+import dev.jeziellago.compose.markdowntext.MarkdownText
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,7 +25,7 @@ import androidx.navigation.NavController
 fun ReviewDetailScreen(
     title: String,
     content: String,
-    navController: NavController //
+    navController: NavController
 ) {
     Scaffold(
         topBar = {
@@ -51,28 +51,51 @@ fun ReviewDetailScreen(
                     )
                 },
                 actions = {
-                    // 添加一个和导航图标宽度相同的占位视图，让右侧保持空白
-                    // 假设导航图标的宽度大约是48.dp（可以根据实际情况调整）
-                    Spacer(modifier = Modifier.width(48.dp))
+                    Spacer(modifier = Modifier.width(48.dp)) // 占位以视觉居中标题
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
                 )
             )
-
         }
     ) { innerPadding ->
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
+                .fillMaxSize()
         ) {
-            Text(
-                text = content,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            val maxHeight = this.maxHeight
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .heightIn(max = maxHeight)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                MarkdownText(
+                    markdown = content,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
+    }
+}
+
+
+@Composable
+fun MarkdownContent(content: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        MarkdownText(
+            markdown = content,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }

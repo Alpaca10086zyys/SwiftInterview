@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -31,6 +32,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -179,7 +181,7 @@ fun UploadScreen(navController: NavController, userId: String) {
                                     uploadState = UploadState.SUCCESS
                                     Log.d("UploadScreen", "上传成功: ${response.body()?.message}")
                                     // 短暂延迟后返回
-                                    kotlinx.coroutines.delay(1500)
+                                    delay(1500)
                                     navController.popBackStack()
                                 } else {
                                     val errorBody = response.errorBody()?.string() ?: "未知错误"
@@ -237,7 +239,7 @@ private suspend fun uploadFile(file: File, userId: String): Response<UploadRespo
             val userIdBody = userId.toRequestBody("text/plain".toMediaTypeOrNull())
 
             val retrofit = Retrofit.Builder()
-                .baseUrl("http://192.168.255.26:5000/")
+                .baseUrl("http://192.168.0.106:5000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
@@ -246,7 +248,7 @@ private suspend fun uploadFile(file: File, userId: String): Response<UploadRespo
         } catch (e: Exception) {
             Log.e("UploadScreen", "上传异常", e)
             // 创建错误响应
-            Response.error(500, okhttp3.ResponseBody.create(null, e.message ?: "Unknown error"))
+            Response.error(500, ResponseBody.create(null, e.message ?: "Unknown error"))
         }
     }
 }
