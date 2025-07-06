@@ -23,7 +23,7 @@ import com.example.reply.network.ApiService
 fun RegisterScreen(
     onBackClicked: () -> Unit,
     onLoginClicked: () -> Unit,
-    onRegisterSuccess: (UserData) -> Unit // 修改为接收 UserData
+    onRegisterSuccess: (UserData) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var nickname by remember { mutableStateOf("") }

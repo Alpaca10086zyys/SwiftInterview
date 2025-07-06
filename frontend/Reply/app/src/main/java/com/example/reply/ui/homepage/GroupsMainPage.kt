@@ -19,7 +19,10 @@ fun GroupsMainPage(
     onLoginClicked: () -> Unit,
     userData: UserData? = null,
     onLogout: () -> Unit = {},
-    onJobStatusUpdated: (String) -> Unit = {}  // 可传给 ViewModel 做持久化
+    onJobStatusUpdated: (String) -> Unit = {},
+    onAccountClick: () -> Unit = {},
+    onHelpClick: () -> Unit = {},
+    onRateClick: () -> Unit = {}
 ) {
     // 求职状态
     val jobStatusInitial = userData?.jobStatus ?: "离校-随时到岗"
@@ -40,7 +43,7 @@ fun GroupsMainPage(
                 if (!success) {
                     // 失败时恢复原状态
                     jobStatus = jobStatusInitial
-                    // 显示错误消息（实际应用中可用 Snackbar）
+                    // 显示错误消息
                     println("求职状态更新失败: $message")
                 }
             }
@@ -75,8 +78,13 @@ fun GroupsMainPage(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 功能按钮区域
-            FunctionButtonsSection()
+            FunctionButtonsSection(
+                onAccountClick = onAccountClick,
+                onHelpClick = onHelpClick,
+                onRateClick = onRateClick
+            )
+
+
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -91,7 +99,7 @@ fun GroupsMainPage(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     RadarChart(
-                        values = listOf(4.2f, 3.8f, 4.5f, 3.5f, 4.0f, 4.7f),
+                        values = listOf(4.2f, 3.8f, 4.5f, 3.5f, 4.0f, 3.7f),
                         labels = listOf("结构化表达", "项目经验", "行业理解", "即兴应变", "专业深度", "沟通能力"),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)

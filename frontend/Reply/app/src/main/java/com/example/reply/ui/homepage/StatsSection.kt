@@ -48,7 +48,7 @@ fun StatsSection(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 统一布局：标记在上，数值在下
+            //标记在上，数值在下
             StatItem(title = "模拟面试次数", value = interviewCount.toString())
 
             Divider(
@@ -65,7 +65,7 @@ fun StatsSection(
                     .width(1.dp)
             )
 
-            // 求职状态选择器 - 统一布局
+            // 求职状态选择器
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
@@ -83,7 +83,7 @@ fun StatsSection(
                     modifier = Modifier
                         .wrapContentSize()
                 ) {
-                    // 简洁的下拉触发区域
+                    // 下拉触发区域
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -133,7 +133,7 @@ fun StatsSection(
     }
 }
 
-// 统一布局：标题在上，数值在下
+// 标题在上，数值在下
 @Composable
 fun StatItem(title: String, value: String) {
     Column(

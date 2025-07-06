@@ -1,4 +1,3 @@
-// ReplyApp.kt
 package com.example.reply.ui
 
 import androidx.compose.material3.Surface
@@ -22,8 +21,11 @@ import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
 import com.example.reply.data.UserData
 import com.example.reply.ui.daliyquestion.DailyQuestionPage
+import com.example.reply.ui.homepage.AccountScreen
 import com.example.reply.ui.homepage.GroupsScreen
+import com.example.reply.ui.homepage.HelpFeedbackScreen
 import com.example.reply.ui.homepage.LoginScreen
+import com.example.reply.ui.homepage.RateUsScreen
 import com.example.reply.ui.homepage.RegisterScreen
 import com.example.reply.ui.interview.InterviewScreen
 import com.example.reply.ui.intervieweview.ReviewDetailScreen
@@ -165,8 +167,16 @@ private fun ReplyNavHost(
                 }
             )
         }
+        composable<Route.Account> {
+            groupsUserData?.let {
+                AccountScreen(userData = it, onLogout = { onGroupsUserDataChange(null) })
+            }
+        }
+        composable<Route.Help> { HelpFeedbackScreen() }
+        composable<Route.Rate> { RateUsScreen() }
 
-        // 添加上传屏幕的路由定义（使用字符串路由）
+
+        // 添加上传屏幕的路由定义
         composable(
             route = "upload/{userId}",
             arguments = listOf(

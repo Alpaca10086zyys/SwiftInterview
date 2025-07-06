@@ -1,4 +1,3 @@
-// ReplyNavigationActions.kt
 package com.example.reply.ui.navigation
 
 import androidx.compose.material.icons.Icons
@@ -23,11 +22,11 @@ sealed interface Route {
     @Serializable data object Groups : Route
     @Serializable data object Login : Route
     @Serializable data object Register : Route
-    // 添加上传路由对象
     @Serializable data object Upload : Route
     @Serializable data object ReviewDetail : Route
-
-
+    @Serializable data object Account : Route
+    @Serializable data object Help : Route
+    @Serializable data object Rate : Route
 }
 
 data class ReplyTopLevelDestination(val route: Route, val selectedIcon: ImageVector, val unselectedIcon: ImageVector, val iconTextId: Int)
@@ -44,9 +43,8 @@ class ReplyNavigationActions(private val navController: NavHostController) {
         }
     }
 
-    // 修复上传导航方法
+
     fun navigateToUpload(userId: String) {
-        // 使用正确的路由格式
         navController.navigate("upload/$userId") {
             launchSingleTop = true
         }

@@ -10,7 +10,7 @@ import org.json.JSONObject
 import java.io.IOException
 
 object ApiService {
-    private const val BASE_URL = "http://192.168.0.106:5000/api/user"
+    private const val BASE_URL = "http://192.168.255.18:5000/api/user"
     private val client = OkHttpClient()
     private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
     private val mainHandler = Handler(Looper.getMainLooper())

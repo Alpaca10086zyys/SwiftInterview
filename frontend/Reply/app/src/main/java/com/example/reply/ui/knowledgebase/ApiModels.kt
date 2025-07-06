@@ -32,7 +32,7 @@ data class DeleteResponse(
     val user_id: String
 )
 
-// 文档类型枚举 - 只保留需要的文件类型
+// 文档类型枚举
 enum class DocumentType(
     val displayName: String
 ) {

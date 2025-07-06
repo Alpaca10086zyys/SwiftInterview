@@ -26,38 +26,44 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun FunctionButtonsSection() {
+fun FunctionButtonsSection(
+    onAccountClick: () -> Unit,
+    onHelpClick: () -> Unit,
+    onRateClick: () -> Unit
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 4.dp
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             FunctionButton(
                 icon = Icons.Filled.AccountCircle,
-                text = "我的账户"
+                text = "我的账户",
+                onClick = onAccountClick
             )
             Spacer(modifier = Modifier.height(8.dp))
             FunctionButton(
                 icon = Icons.Filled.Help,
-                text = "帮助与反馈"
+                text = "帮助与反馈",
+                onClick = onHelpClick
             )
             Spacer(modifier = Modifier.height(8.dp))
             FunctionButton(
                 icon = Icons.Filled.Star,
-                text = "给我们好评"
+                text = "给我们好评",
+                onClick = onRateClick
             )
         }
     }
 }
 
+
 @Composable
-fun FunctionButton(icon: ImageVector, text: String) {
+fun FunctionButton(icon: ImageVector, text: String, onClick: () -> Unit) {
     Button(
-        onClick = { /* 处理点击事件 */ },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp),

@@ -175,7 +175,7 @@ private fun parseIsoDate(dateString: String): Date {
 private suspend fun fetchDocuments(userId: String): List<FileResponse> {
     return withContext(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.0.106:5000/")
+            .baseUrl("http://192.168.255.18:5000/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -192,7 +192,7 @@ private suspend fun fetchDocuments(userId: String): List<FileResponse> {
 private suspend fun deleteDocument(fileId: Long, userId: String) {
     withContext(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.0.106:5000/")
+            .baseUrl("http://192.168.255.18:5000/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

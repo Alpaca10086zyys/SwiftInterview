@@ -13,10 +13,19 @@ fun GroupsScreen(
 ) {
     GroupsMainPage(
         onLoginClicked = {
-            // 使用 Route.Login 对象
             navController.navigate(Route.Login)
         },
         userData = userData,
-        onLogout = onLogout
+        onLogout = onLogout,
+
+        onAccountClick = {
+            navController.navigate(Route.Account)
+        },
+        onHelpClick = {
+            navController.navigate(Route.Help)
+        },
+        onRateClick = {
+            navController.navigate(Route.Rate)
+        }
     )
 }
